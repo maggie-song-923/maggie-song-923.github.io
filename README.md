@@ -1,126 +1,182 @@
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>What Animal Are You · 你是一只什么动物</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600&family=Noto+Sans+SC:wght@400;500&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg1:#F4EEE5; --bg2:#E7EDE6; --bg3:#EFE8EE;
-    --paper:#FCFAF5; --paper2:#F7F2E9;
-    --ink:#36352F; --muted:#797668; --faint:#A8A395;
-    --line:#E6DFD0; --line2:#EDE7DA;
-    --sage:#7E9B82; --sage-d:#5E7A63;
-    --rose:#C58B81; --teal:#5C8C8F; --clay:#BE8B45;
-    --tone:#7E9B82; --tone-soft:#7E9B8222;
-    --radius:18px;
-    --serif:"Songti SC","STSong","SimSun","Noto Serif SC",serif;
-    --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;
+    --ink:#2E3A34; --muted:#6B7670; --faint:#9DA8A1;
+    --line:#DDE4DF; --line2:#E6ECE7;
+    --sage:#8AA89B; --sage-d:#5E7A6E;
+    --paper:#FAFBF8;
+    --bg-quiz:#E9EDEA;
+    --tone:#7FB3B6; --tone-soft:#7FB3B622;
+    --radius:22px;
+    --serif-h:"Cormorant Garamond","Noto Serif SC","Songti SC","STSong","Source Han Serif SC",serif;
+    --serif:"Noto Serif SC","Songti SC","STSong","Source Han Serif SC",serif;
+    --sans:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;}
   body{
-    font-family:var(--sans); color:var(--ink);
-    background:linear-gradient(170deg,var(--bg1) 0%,var(--bg3) 48%,var(--bg2) 100%);
-    background-attachment:fixed;
-    min-height:100dvh; line-height:1.78; letter-spacing:.01em;
-    -webkit-font-smoothing:antialiased;
+    font-family:var(--sans); color:var(--ink); background:var(--bg-quiz);
+    min-height:100dvh; line-height:1.85; letter-spacing:.01em;
+    -webkit-font-smoothing:antialiased; transition:background-color .6s ease, color .6s ease;
   }
-  body::before{
-    content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
-    background:radial-gradient(60% 45% at 50% 18%,#FFFFFF55,transparent 70%);
-    animation:breathe 11s ease-in-out infinite;
-  }
-  @keyframes breathe{0%,100%{opacity:.5;transform:scale(1);}50%{opacity:.85;transform:scale(1.06);}}
+  body[data-screen="intro"]{ background:linear-gradient(170deg,#EEF1ED 0%,#EAEEEC 50%,#E6ECEC 100%); background-attachment:fixed; }
+  body[data-screen="quiz"]{ background:#E9EDEA; }
+  body[data-screen="result"]{ background:#2B3A36; color:#EAEFEA; }
+
+  body::before{ content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:radial-gradient(60% 42% at 50% 14%,#FFFFFF40,transparent 70%); animation:breathe 12s ease-in-out infinite; }
+  body[data-screen="result"]::before{ background:radial-gradient(60% 42% at 50% 12%,#FFFFFF12,transparent 70%); }
+  body::after{ content:""; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.03;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  @keyframes breathe{0%,100%{opacity:.45;transform:scale(1);}50%{opacity:.8;transform:scale(1.05);}}
   @media (prefers-reduced-motion:reduce){body::before{animation:none;} *{animation:none!important;transition:none!important;}}
 
-  .toggle{
-    position:fixed; top:16px; right:16px; z-index:5;
-    font-family:var(--sans); font-size:.82rem; font-weight:600; letter-spacing:.08em;
-    color:var(--sage-d); background:#FCFAF5cc; backdrop-filter:blur(6px);
-    border:1px solid var(--line); border-radius:999px; padding:7px 15px; cursor:pointer;
-    transition:background .2s,color .2s,border-color .2s;
-  }
-  .toggle:hover{background:var(--sage); color:#fff; border-color:var(--sage);}
+  .enso{position:fixed; z-index:0; pointer-events:none; display:none; color:var(--sage); line-height:0;}
+  .enso svg{width:100%; height:100%; display:block;}
+  .enso-intro{ top:5%; right:-7%; width:54vw; max-width:430px; opacity:.30; animation:breathe 12s ease-in-out infinite; }
+  .enso-quiz{ bottom:-15%; right:-13%; width:66vw; max-width:540px; opacity:.13; }
+  .enso-result{ top:9%; left:50%; transform:translateX(-50%); width:76vw; max-width:470px; opacity:.16; color:var(--tone); }
+  body[data-screen="intro"] .enso-intro{display:block;}
+  body[data-screen="quiz"] .enso-quiz{display:block;}
+  body[data-screen="result"] .enso-result{display:block;}
 
-  .wrap{position:relative;z-index:1;max-width:640px;margin:0 auto;padding:clamp(40px,8vw,72px) clamp(20px,5vw,40px) 72px;}
+  .vlabel{position:fixed; z-index:2; writing-mode:vertical-rl; text-orientation:upright;
+          letter-spacing:.32em; font-size:.74rem; color:var(--faint); font-family:var(--serif); display:none;}
+  .vlabel-intro{ top:7%; left:5.5%; }
+  .vlabel-result{ top:8%; left:5.5%; color:#8FA39B; }
+  body[data-screen="intro"] .vlabel-intro{display:block;}
+  body[data-screen="result"] .vlabel-result{display:block;}
+  body[data-lang="en"] .vlabel{display:none;}
+
+  /* ghost toggle */
+  .toggle{ position:fixed; top:14px; right:14px; z-index:6; font-family:var(--sans);
+    font-size:.8rem; font-weight:600; letter-spacing:.06em; color:var(--faint);
+    background:none; border:none; padding:6px 8px; cursor:pointer; opacity:.7; transition:opacity .2s,color .2s; }
+  .toggle:hover{ opacity:1; color:var(--sage-d); }
+  body[data-screen="result"] .toggle{ color:#8FA39B; }
+  body[data-screen="result"] .toggle:hover{ color:#CFE0DA; }
+
+  .wrap{position:relative;z-index:1;max-width:640px;margin:0 auto;padding:clamp(48px,9vw,80px) clamp(22px,5vw,40px) 80px;}
 
   .screen{display:none;}
   .screen.on{display:block;animation:rise .6s cubic-bezier(.2,.7,.2,1) both;}
   @keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
 
-  .eyebrow{font-size:.78rem;letter-spacing:.28em;color:var(--sage-d);margin:0 0 20px;font-weight:600;}
-  .title{font-family:var(--serif);font-weight:600;font-size:clamp(2.2rem,8.5vw,3.3rem);line-height:1.18;margin:0;letter-spacing:.02em;}
-  .subtitle{font-family:var(--serif);font-size:1.1rem;color:var(--muted);margin:16px 0 0;letter-spacing:.04em;}
-  .lede{margin:28px 0 0;color:#55524A;font-size:1.02rem;white-space:pre-line;}
-  .note{margin:28px 0 0;font-size:.86rem;color:var(--faint);letter-spacing:.04em;}
-  .start{
-    margin-top:36px;display:inline-flex;align-items:center;gap:.6em;
-    font-family:var(--sans);font-size:1.02rem;font-weight:600;color:#fff;
-    background:var(--sage);border:none;border-radius:999px;
-    padding:15px 34px;cursor:pointer;transition:transform .2s,box-shadow .2s,background .2s;
-    box-shadow:0 8px 22px -10px var(--sage-d);
-  }
+  .eyebrow{font-size:.78rem;letter-spacing:.26em;color:var(--sage-d);margin:0 0 22px;font-weight:600;}
+  .title{font-family:var(--serif);font-weight:500;font-size:clamp(2.1rem,8.5vw,3.3rem);line-height:1.2;margin:0;letter-spacing:.06em;}
+  .subtitle{font-family:var(--serif);font-weight:400;font-size:1.06rem;color:var(--muted);margin:18px 0 0;letter-spacing:.08em;}
+  .lede{margin:30px 0 0;color:#4F564F;font-size:1.0rem;white-space:pre-line;}
+  .note{margin:28px 0 0;font-size:.84rem;color:var(--faint);letter-spacing:.05em;}
+  .start{ margin-top:38px;display:inline-flex;align-items:center;gap:.6em;
+    font-family:var(--sans);font-size:1.0rem;font-weight:600;color:#fff;
+    background:var(--sage);border:none;border-radius:999px;padding:16px 38px;min-height:52px;cursor:pointer;
+    transition:transform .2s,box-shadow .2s,background .2s; box-shadow:0 10px 26px -12px var(--sage-d); }
   .start:hover{background:var(--sage-d);transform:translateY(-1px);}
   .start .arr{transition:transform .25s;}
   .start:hover .arr{transform:translateX(3px);}
 
-  .topbar{display:flex;align-items:center;gap:14px;margin-bottom:30px;min-height:24px;}
-  .back{background:none;border:none;color:var(--faint);font-size:.9rem;cursor:pointer;padding:4px 0;font-family:var(--sans);display:none;}
+  .topbar{display:flex;align-items:center;gap:14px;margin-bottom:26px;min-height:24px;}
+  .back{background:none;border:none;color:var(--faint);font-size:.9rem;cursor:pointer;padding:6px 0;font-family:var(--sans);display:none;}
   .back.show{display:inline-block;}
   .back:hover{color:var(--muted);}
   .counter{font-size:.82rem;color:var(--faint);letter-spacing:.12em;margin-left:auto;font-variant-numeric:tabular-nums;}
-  .bar{height:3px;background:var(--line);border-radius:999px;overflow:hidden;margin-bottom:38px;}
-  .bar > i{display:block;height:100%;width:0;background:var(--sage);border-radius:999px;transition:width .5s cubic-bezier(.2,.7,.2,1);}
+  .bar{height:3px;background:#D7DFDA;border-radius:999px;margin-bottom:36px;position:relative;}
+  .bar > i{display:block;height:100%;width:0;background:var(--sage);border-radius:999px;transition:width .5s cubic-bezier(.2,.7,.2,1);position:relative;}
+  .bar > i::after{content:"";position:absolute;right:-1px;top:50%;width:7px;height:7px;border-radius:50%;background:var(--sage);transform:translateY(-50%);box-shadow:0 0 0 3px #8AA89B33;}
 
-  .qnum{font-family:var(--serif);color:var(--faint);font-size:.9rem;letter-spacing:.1em;margin-bottom:14px;}
-  .question{font-family:var(--serif);font-weight:600;font-size:clamp(1.3rem,4.8vw,1.65rem);line-height:1.5;margin:0 0 28px;letter-spacing:.01em;}
+  /* anchored question zone — keeps option start position stable */
+  .qhead{ min-height:7.5rem; display:flex; flex-direction:column; justify-content:flex-end; margin-bottom:28px; }
+  .qnum{font-family:var(--serif);color:var(--faint);font-size:.9rem;letter-spacing:.12em;margin-bottom:14px;}
+  .question{font-family:var(--serif);font-weight:500;font-size:clamp(1.28rem,4.6vw,1.6rem);line-height:1.55;margin:0;letter-spacing:.02em;}
 
   .opts{display:flex;flex-direction:column;gap:12px;}
-  .opt{
-    text-align:left;font-family:var(--sans);font-size:1.0rem;color:var(--ink);line-height:1.6;
+  .opt{ text-align:left;font-family:var(--sans);font-size:1.0rem;color:var(--ink);line-height:1.6;
     background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
-    padding:17px 20px;cursor:pointer;
-    transition:border-color .2s,background .2s,transform .12s,box-shadow .2s;
-  }
-  .opt:hover{border-color:var(--sage);background:#fff;box-shadow:0 6px 20px -14px #5e7a6355;}
+    padding:16px 20px;min-height:64px;display:flex;align-items:center;cursor:pointer;
+    transition:border-color .2s,background .2s,transform .12s,box-shadow .2s; }
+  .opt:hover{border-color:var(--sage);background:#fff;box-shadow:0 8px 22px -16px #5E7A6E66;}
   .opt:active{transform:scale(.992);}
   .opt:focus-visible{outline:2px solid var(--sage);outline-offset:2px;}
 
+  /* result (dark) */
   .r-axes{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;}
-  .tag{font-size:.8rem;letter-spacing:.08em;color:var(--tone);background:var(--tone-soft);
-       border-radius:999px;padding:6px 14px;font-weight:600;}
-  .r-pre{font-size:.92rem;color:var(--muted);letter-spacing:.16em;margin:0 0 2px;}
-  .r-name{font-family:var(--serif);font-weight:600;font-size:clamp(2.6rem,11vw,4rem);
-          line-height:1.06;margin:0;color:var(--ink);letter-spacing:.03em;}
-  .r-mirror{position:relative;height:.9em;overflow:hidden;margin:-.06em 0 30px;
-            font-family:var(--serif);font-weight:600;font-size:clamp(2.6rem,11vw,4rem);
-            line-height:1.06;color:var(--tone);transform:scaleY(-1);letter-spacing:.03em;
-            -webkit-mask-image:linear-gradient(to bottom,#000,transparent 80%);
-            mask-image:linear-gradient(to bottom,#000,transparent 80%);opacity:.24;filter:blur(.5px);}
+  .tag{font-size:.78rem;letter-spacing:.1em;color:var(--tone);background:transparent;border:1px solid var(--tone);border-radius:999px;padding:6px 14px;font-weight:600;}
+  .r-pre{font-size:.9rem;color:#9DB0A8;letter-spacing:.18em;margin:0 0 4px;}
+  .r-name{font-family:var(--serif-h);font-weight:600;font-size:clamp(2.6rem,12vw,4.3rem);line-height:1.06;margin:0;color:#EEF3EF;letter-spacing:.04em;}
+  .r-mirror{position:relative;height:.9em;overflow:hidden;margin:-.05em 0 32px;
+            font-family:var(--serif-h);font-weight:600;font-size:clamp(2.6rem,12vw,4.3rem);
+            line-height:1.06;color:var(--tone);transform:scaleY(-1);letter-spacing:.04em;
+            -webkit-mask-image:linear-gradient(to bottom,#000,transparent 82%);
+            mask-image:linear-gradient(to bottom,#000,transparent 82%);opacity:.34;filter:blur(.4px);}
 
-  .habit{background:var(--paper2);border-radius:var(--radius);padding:20px 22px;margin:0 0 32px;border:1px solid var(--line2);}
-  .habit b{display:block;font-size:.74rem;letter-spacing:.18em;color:var(--tone);margin-bottom:8px;font-weight:700;text-transform:uppercase;}
-  .habit p{margin:0;font-size:1.0rem;color:#4D4A42;line-height:1.7;}
+  .habit{background:#33433E;border-radius:var(--radius);padding:20px 22px;margin:0 0 34px;border:1px solid #3D4D47;}
+  .habit b{display:block;font-size:.72rem;letter-spacing:.16em;color:var(--tone);margin-bottom:8px;font-weight:700;text-transform:uppercase;}
+  .habit p{margin:0;font-size:1.0rem;color:#D4DDD8;line-height:1.72;}
 
-  .sec{margin:0 0 24px;}
-  .sec h3{font-family:var(--serif);font-size:1.18rem;margin:0 0 8px;color:var(--ink);letter-spacing:.03em;}
-  .sec p{margin:0;color:#4A473F;font-size:1.0rem;}
-  .sec.intro p{font-family:var(--serif);font-size:1.16rem;color:var(--ink);line-height:1.7;}
-  .sec.reframe{background:var(--tone-soft);border-radius:var(--radius);padding:20px 22px;}
+  .sec{margin:0 0 26px;}
+  .sec h3{font-family:var(--serif);font-weight:500;font-size:1.18rem;margin:0 0 8px;color:#EAEFEA;letter-spacing:.05em;}
+  .sec p{margin:0;color:#C8D2CD;font-size:1.0rem;}
+  .sec.intro p{font-family:var(--serif);font-size:1.16rem;color:#E7EDE9;line-height:1.72;}
+  .sec.reframe{background:var(--tone-soft);border-left:2px solid var(--tone);border-radius:14px;padding:20px 22px;}
+  .sec.reframe h3{color:var(--tone);}
 
-  .divider{height:1px;background:var(--line);margin:32px 0;border:0;}
-  .r-foot{margin-top:34px;display:flex;flex-direction:column;gap:14px;}
-  .again{align-self:flex-start;font-family:var(--sans);font-size:.98rem;font-weight:600;color:var(--sage-d);
-         background:none;border:1px solid var(--sage);border-radius:999px;padding:12px 26px;cursor:pointer;
-         transition:background .2s,color .2s;}
-  .again:hover{background:var(--sage);color:#fff;}
-  .share{font-size:.84rem;color:var(--faint);letter-spacing:.02em;}
+  .divider{height:1px;width:54px;background:#42524C;margin:34px 0;border:0;}
+  .r-foot{margin-top:34px;display:flex;flex-direction:column;gap:16px;}
+  .foot-row{display:flex;gap:12px;flex-wrap:wrap;}
+  .again{font-family:var(--sans);font-size:.96rem;font-weight:600;color:var(--tone);
+         background:none;border:1px solid var(--tone);border-radius:999px;padding:13px 26px;min-height:48px;cursor:pointer;transition:background .2s,color .2s;}
+  .again:hover{background:var(--tone);color:#2B3A36;}
+  .sharebtn{font-family:var(--sans);font-size:.96rem;font-weight:600;color:#2B3A36;background:var(--tone);
+            border:none;border-radius:999px;padding:13px 26px;min-height:48px;cursor:pointer;transition:filter .2s;}
+  .sharebtn:hover{filter:brightness(1.06);}
+  .share{font-size:.84rem;color:#8FA39B;letter-spacing:.02em;}
 
-  .credit{margin-top:54px;font-size:.76rem;color:var(--faint);letter-spacing:.05em;text-align:center;}
+  .credit{margin-top:56px;font-size:.76rem;color:var(--faint);letter-spacing:.06em;text-align:center;}
+  body[data-screen="result"] .credit{color:#7E928B;}
+
+  /* share modal */
+  .share-modal{position:fixed;inset:0;z-index:50;background:rgba(20,26,24,.88);backdrop-filter:blur(5px);
+    display:flex;flex-direction:column;align-items:center;overflow:auto;padding:18px;}
+  .share-modal[hidden]{display:none;}
+  .share-top{position:sticky;top:0;width:100%;max-width:440px;display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;padding-top:4px;}
+  .seg{display:inline-flex;border:1px solid #ffffff3a;border-radius:999px;overflow:hidden;}
+  .seg button{background:none;border:none;color:#cdd6d1;font-family:var(--sans);font-weight:600;font-size:.84rem;padding:8px 20px;cursor:pointer;}
+  .seg button.on{background:#fff;color:#2B3A36;}
+  .sc-close{background:none;border:none;color:#cdd6d1;font-size:1.5rem;line-height:1;cursor:pointer;padding:4px 10px;}
+  .share-img{width:100%;max-width:400px;border-radius:14px;box-shadow:0 24px 64px -24px #000;display:block;background:#2B3A36;}
+  .share-hint{color:#cdd6d1;font-size:.84rem;margin:16px 0 10px;text-align:center;max-width:400px;line-height:1.6;}
+  .share-dl{display:inline-block;color:#2B3A36;background:#CFE0DA;border-radius:999px;padding:11px 26px;font-family:var(--sans);font-weight:600;font-size:.9rem;text-decoration:none;margin-bottom:30px;}
+
+  @media (max-width:600px){
+    .vlabel{display:none !important;}
+    .wrap{padding:42px 20px 64px;}
+    .enso-intro{opacity:.22;max-width:300px;width:50vw;}
+    .enso-quiz{opacity:.10;}
+    .enso-result{opacity:.14;max-width:340px;}
+    body[data-lang="zh"] .qhead{min-height:8.5rem;}
+    body[data-lang="en"] .qhead{min-height:11.5rem;}
+    .toggle{top:12px;right:10px;}
+  }
 </style>
 </head>
-<body>
+<body data-screen="intro" data-lang="zh">
 <button class="toggle" id="toggle">EN</button>
+
+<div class="enso enso-intro" aria-hidden="true"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="86" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="498 44" transform="rotate(38 100 100)"/></svg></div>
+<div class="enso enso-quiz" aria-hidden="true"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="86" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="498 44" transform="rotate(38 100 100)"/></svg></div>
+<div class="enso enso-result" aria-hidden="true"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="86" fill="currentColor"/></svg></div>
+
+<div class="vlabel vlabel-intro" id="vlabel-intro" aria-hidden="true"></div>
+<div class="vlabel vlabel-result" id="vlabel-result" aria-hidden="true"></div>
+
 <div class="wrap">
 
   <section id="intro" class="screen on">
@@ -138,8 +194,10 @@
       <span class="counter" id="q-counter"></span>
     </div>
     <div class="bar"><i id="q-bar"></i></div>
-    <p class="qnum" id="q-num"></p>
-    <h2 class="question" id="q-text"></h2>
+    <div class="qhead">
+      <p class="qnum" id="q-num"></p>
+      <h2 class="question" id="q-text"></h2>
+    </div>
     <div class="opts" id="q-opts"></div>
   </section>
 
@@ -162,7 +220,10 @@
 
     <hr class="divider">
     <div class="r-foot">
-      <button class="again" id="r-again"></button>
+      <div class="foot-row">
+        <button class="again" id="r-again"></button>
+        <button class="sharebtn" id="r-share-btn"></button>
+      </div>
       <span class="share" id="r-share"></span>
     </div>
   </section>
@@ -170,29 +231,2341 @@
   <p class="credit" id="credit"></p>
 </div>
 
+<div class="share-modal" id="share-modal" hidden>
+  <div class="share-top">
+    <div class="seg"><button id="sc-dark" class="on"></button><button id="sc-light"></button></div>
+    <button class="sc-close" id="sc-close" aria-label="close">✕</button>
+  </div>
+  <img class="share-img" id="share-img" alt="">
+  <p class="share-hint" id="share-hint"></p>
+  <a class="share-dl" id="share-dl" download="animal.png"></a>
+</div>
+
+<script>//---------------------------------------------------------------------
+//
+// QR Code Generator for JavaScript
+//
+// Copyright (c) 2009 Kazuhiko Arase
+//
+// URL: http://www.d-project.com/
+//
+// Licensed under the MIT license:
+//  http://www.opensource.org/licenses/mit-license.php
+//
+// The word 'QR Code' is registered trademark of
+// DENSO WAVE INCORPORATED
+//  http://www.denso-wave.com/qrcode/faqpatent-e.html
+//
+//---------------------------------------------------------------------
+
+var qrcode = function() {
+
+  //---------------------------------------------------------------------
+  // qrcode
+  //---------------------------------------------------------------------
+
+  /**
+   * qrcode
+   * @param typeNumber 1 to 40
+   * @param errorCorrectionLevel 'L','M','Q','H'
+   */
+  var qrcode = function(typeNumber, errorCorrectionLevel) {
+
+    var PAD0 = 0xEC;
+    var PAD1 = 0x11;
+
+    var _typeNumber = typeNumber;
+    var _errorCorrectionLevel = QRErrorCorrectionLevel[errorCorrectionLevel];
+    var _modules = null;
+    var _moduleCount = 0;
+    var _dataCache = null;
+    var _dataList = [];
+
+    var _this = {};
+
+    var makeImpl = function(test, maskPattern) {
+
+      _moduleCount = _typeNumber * 4 + 17;
+      _modules = function(moduleCount) {
+        var modules = new Array(moduleCount);
+        for (var row = 0; row < moduleCount; row += 1) {
+          modules[row] = new Array(moduleCount);
+          for (var col = 0; col < moduleCount; col += 1) {
+            modules[row][col] = null;
+          }
+        }
+        return modules;
+      }(_moduleCount);
+
+      setupPositionProbePattern(0, 0);
+      setupPositionProbePattern(_moduleCount - 7, 0);
+      setupPositionProbePattern(0, _moduleCount - 7);
+      setupPositionAdjustPattern();
+      setupTimingPattern();
+      setupTypeInfo(test, maskPattern);
+
+      if (_typeNumber >= 7) {
+        setupTypeNumber(test);
+      }
+
+      if (_dataCache == null) {
+        _dataCache = createData(_typeNumber, _errorCorrectionLevel, _dataList);
+      }
+
+      mapData(_dataCache, maskPattern);
+    };
+
+    var setupPositionProbePattern = function(row, col) {
+
+      for (var r = -1; r <= 7; r += 1) {
+
+        if (row + r <= -1 || _moduleCount <= row + r) continue;
+
+        for (var c = -1; c <= 7; c += 1) {
+
+          if (col + c <= -1 || _moduleCount <= col + c) continue;
+
+          if ( (0 <= r && r <= 6 && (c == 0 || c == 6) )
+              || (0 <= c && c <= 6 && (r == 0 || r == 6) )
+              || (2 <= r && r <= 4 && 2 <= c && c <= 4) ) {
+            _modules[row + r][col + c] = true;
+          } else {
+            _modules[row + r][col + c] = false;
+          }
+        }
+      }
+    };
+
+    var getBestMaskPattern = function() {
+
+      var minLostPoint = 0;
+      var pattern = 0;
+
+      for (var i = 0; i < 8; i += 1) {
+
+        makeImpl(true, i);
+
+        var lostPoint = QRUtil.getLostPoint(_this);
+
+        if (i == 0 || minLostPoint > lostPoint) {
+          minLostPoint = lostPoint;
+          pattern = i;
+        }
+      }
+
+      return pattern;
+    };
+
+    var setupTimingPattern = function() {
+
+      for (var r = 8; r < _moduleCount - 8; r += 1) {
+        if (_modules[r][6] != null) {
+          continue;
+        }
+        _modules[r][6] = (r % 2 == 0);
+      }
+
+      for (var c = 8; c < _moduleCount - 8; c += 1) {
+        if (_modules[6][c] != null) {
+          continue;
+        }
+        _modules[6][c] = (c % 2 == 0);
+      }
+    };
+
+    var setupPositionAdjustPattern = function() {
+
+      var pos = QRUtil.getPatternPosition(_typeNumber);
+
+      for (var i = 0; i < pos.length; i += 1) {
+
+        for (var j = 0; j < pos.length; j += 1) {
+
+          var row = pos[i];
+          var col = pos[j];
+
+          if (_modules[row][col] != null) {
+            continue;
+          }
+
+          for (var r = -2; r <= 2; r += 1) {
+
+            for (var c = -2; c <= 2; c += 1) {
+
+              if (r == -2 || r == 2 || c == -2 || c == 2
+                  || (r == 0 && c == 0) ) {
+                _modules[row + r][col + c] = true;
+              } else {
+                _modules[row + r][col + c] = false;
+              }
+            }
+          }
+        }
+      }
+    };
+
+    var setupTypeNumber = function(test) {
+
+      var bits = QRUtil.getBCHTypeNumber(_typeNumber);
+
+      for (var i = 0; i < 18; i += 1) {
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+        _modules[Math.floor(i / 3)][i % 3 + _moduleCount - 8 - 3] = mod;
+      }
+
+      for (var i = 0; i < 18; i += 1) {
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+        _modules[i % 3 + _moduleCount - 8 - 3][Math.floor(i / 3)] = mod;
+      }
+    };
+
+    var setupTypeInfo = function(test, maskPattern) {
+
+      var data = (_errorCorrectionLevel << 3) | maskPattern;
+      var bits = QRUtil.getBCHTypeInfo(data);
+
+      // vertical
+      for (var i = 0; i < 15; i += 1) {
+
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+
+        if (i < 6) {
+          _modules[i][8] = mod;
+        } else if (i < 8) {
+          _modules[i + 1][8] = mod;
+        } else {
+          _modules[_moduleCount - 15 + i][8] = mod;
+        }
+      }
+
+      // horizontal
+      for (var i = 0; i < 15; i += 1) {
+
+        var mod = (!test && ( (bits >> i) & 1) == 1);
+
+        if (i < 8) {
+          _modules[8][_moduleCount - i - 1] = mod;
+        } else if (i < 9) {
+          _modules[8][15 - i - 1 + 1] = mod;
+        } else {
+          _modules[8][15 - i - 1] = mod;
+        }
+      }
+
+      // fixed module
+      _modules[_moduleCount - 8][8] = (!test);
+    };
+
+    var mapData = function(data, maskPattern) {
+
+      var inc = -1;
+      var row = _moduleCount - 1;
+      var bitIndex = 7;
+      var byteIndex = 0;
+      var maskFunc = QRUtil.getMaskFunction(maskPattern);
+
+      for (var col = _moduleCount - 1; col > 0; col -= 2) {
+
+        if (col == 6) col -= 1;
+
+        while (true) {
+
+          for (var c = 0; c < 2; c += 1) {
+
+            if (_modules[row][col - c] == null) {
+
+              var dark = false;
+
+              if (byteIndex < data.length) {
+                dark = ( ( (data[byteIndex] >>> bitIndex) & 1) == 1);
+              }
+
+              var mask = maskFunc(row, col - c);
+
+              if (mask) {
+                dark = !dark;
+              }
+
+              _modules[row][col - c] = dark;
+              bitIndex -= 1;
+
+              if (bitIndex == -1) {
+                byteIndex += 1;
+                bitIndex = 7;
+              }
+            }
+          }
+
+          row += inc;
+
+          if (row < 0 || _moduleCount <= row) {
+            row -= inc;
+            inc = -inc;
+            break;
+          }
+        }
+      }
+    };
+
+    var createBytes = function(buffer, rsBlocks) {
+
+      var offset = 0;
+
+      var maxDcCount = 0;
+      var maxEcCount = 0;
+
+      var dcdata = new Array(rsBlocks.length);
+      var ecdata = new Array(rsBlocks.length);
+
+      for (var r = 0; r < rsBlocks.length; r += 1) {
+
+        var dcCount = rsBlocks[r].dataCount;
+        var ecCount = rsBlocks[r].totalCount - dcCount;
+
+        maxDcCount = Math.max(maxDcCount, dcCount);
+        maxEcCount = Math.max(maxEcCount, ecCount);
+
+        dcdata[r] = new Array(dcCount);
+
+        for (var i = 0; i < dcdata[r].length; i += 1) {
+          dcdata[r][i] = 0xff & buffer.getBuffer()[i + offset];
+        }
+        offset += dcCount;
+
+        var rsPoly = QRUtil.getErrorCorrectPolynomial(ecCount);
+        var rawPoly = qrPolynomial(dcdata[r], rsPoly.getLength() - 1);
+
+        var modPoly = rawPoly.mod(rsPoly);
+        ecdata[r] = new Array(rsPoly.getLength() - 1);
+        for (var i = 0; i < ecdata[r].length; i += 1) {
+          var modIndex = i + modPoly.getLength() - ecdata[r].length;
+          ecdata[r][i] = (modIndex >= 0)? modPoly.getAt(modIndex) : 0;
+        }
+      }
+
+      var totalCodeCount = 0;
+      for (var i = 0; i < rsBlocks.length; i += 1) {
+        totalCodeCount += rsBlocks[i].totalCount;
+      }
+
+      var data = new Array(totalCodeCount);
+      var index = 0;
+
+      for (var i = 0; i < maxDcCount; i += 1) {
+        for (var r = 0; r < rsBlocks.length; r += 1) {
+          if (i < dcdata[r].length) {
+            data[index] = dcdata[r][i];
+            index += 1;
+          }
+        }
+      }
+
+      for (var i = 0; i < maxEcCount; i += 1) {
+        for (var r = 0; r < rsBlocks.length; r += 1) {
+          if (i < ecdata[r].length) {
+            data[index] = ecdata[r][i];
+            index += 1;
+          }
+        }
+      }
+
+      return data;
+    };
+
+    var createData = function(typeNumber, errorCorrectionLevel, dataList) {
+
+      var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectionLevel);
+
+      var buffer = qrBitBuffer();
+
+      for (var i = 0; i < dataList.length; i += 1) {
+        var data = dataList[i];
+        buffer.put(data.getMode(), 4);
+        buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
+        data.write(buffer);
+      }
+
+      // calc num max data.
+      var totalDataCount = 0;
+      for (var i = 0; i < rsBlocks.length; i += 1) {
+        totalDataCount += rsBlocks[i].dataCount;
+      }
+
+      if (buffer.getLengthInBits() > totalDataCount * 8) {
+        throw 'code length overflow. ('
+          + buffer.getLengthInBits()
+          + '>'
+          + totalDataCount * 8
+          + ')';
+      }
+
+      // end code
+      if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) {
+        buffer.put(0, 4);
+      }
+
+      // padding
+      while (buffer.getLengthInBits() % 8 != 0) {
+        buffer.putBit(false);
+      }
+
+      // padding
+      while (true) {
+
+        if (buffer.getLengthInBits() >= totalDataCount * 8) {
+          break;
+        }
+        buffer.put(PAD0, 8);
+
+        if (buffer.getLengthInBits() >= totalDataCount * 8) {
+          break;
+        }
+        buffer.put(PAD1, 8);
+      }
+
+      return createBytes(buffer, rsBlocks);
+    };
+
+    _this.addData = function(data, mode) {
+
+      mode = mode || 'Byte';
+
+      var newData = null;
+
+      switch(mode) {
+      case 'Numeric' :
+        newData = qrNumber(data);
+        break;
+      case 'Alphanumeric' :
+        newData = qrAlphaNum(data);
+        break;
+      case 'Byte' :
+        newData = qr8BitByte(data);
+        break;
+      case 'Kanji' :
+        newData = qrKanji(data);
+        break;
+      default :
+        throw 'mode:' + mode;
+      }
+
+      _dataList.push(newData);
+      _dataCache = null;
+    };
+
+    _this.isDark = function(row, col) {
+      if (row < 0 || _moduleCount <= row || col < 0 || _moduleCount <= col) {
+        throw row + ',' + col;
+      }
+      return _modules[row][col];
+    };
+
+    _this.getModuleCount = function() {
+      return _moduleCount;
+    };
+
+    _this.make = function() {
+      if (_typeNumber < 1) {
+        var typeNumber = 1;
+
+        for (; typeNumber < 40; typeNumber++) {
+          var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, _errorCorrectionLevel);
+          var buffer = qrBitBuffer();
+
+          for (var i = 0; i < _dataList.length; i++) {
+            var data = _dataList[i];
+            buffer.put(data.getMode(), 4);
+            buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
+            data.write(buffer);
+          }
+
+          var totalDataCount = 0;
+          for (var i = 0; i < rsBlocks.length; i++) {
+            totalDataCount += rsBlocks[i].dataCount;
+          }
+
+          if (buffer.getLengthInBits() <= totalDataCount * 8) {
+            break;
+          }
+        }
+
+        _typeNumber = typeNumber;
+      }
+
+      makeImpl(false, getBestMaskPattern() );
+    };
+
+    _this.createTableTag = function(cellSize, margin) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var qrHtml = '';
+
+      qrHtml += '<table style="';
+      qrHtml += ' border-width: 0px; border-style: none;';
+      qrHtml += ' border-collapse: collapse;';
+      qrHtml += ' padding: 0px; margin: ' + margin + 'px;';
+      qrHtml += '">';
+      qrHtml += '<tbody>';
+
+      for (var r = 0; r < _this.getModuleCount(); r += 1) {
+
+        qrHtml += '<tr>';
+
+        for (var c = 0; c < _this.getModuleCount(); c += 1) {
+          qrHtml += '<td style="';
+          qrHtml += ' border-width: 0px; border-style: none;';
+          qrHtml += ' border-collapse: collapse;';
+          qrHtml += ' padding: 0px; margin: 0px;';
+          qrHtml += ' width: ' + cellSize + 'px;';
+          qrHtml += ' height: ' + cellSize + 'px;';
+          qrHtml += ' background-color: ';
+          qrHtml += _this.isDark(r, c)? '#000000' : '#ffffff';
+          qrHtml += ';';
+          qrHtml += '"/>';
+        }
+
+        qrHtml += '</tr>';
+      }
+
+      qrHtml += '</tbody>';
+      qrHtml += '</table>';
+
+      return qrHtml;
+    };
+
+    _this.createSvgTag = function(cellSize, margin, alt, title) {
+
+      var opts = {};
+      if (typeof arguments[0] == 'object') {
+        // Called by options.
+        opts = arguments[0];
+        // overwrite cellSize and margin.
+        cellSize = opts.cellSize;
+        margin = opts.margin;
+        alt = opts.alt;
+        title = opts.title;
+      }
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      // Compose alt property surrogate
+      alt = (typeof alt === 'string') ? {text: alt} : alt || {};
+      alt.text = alt.text || null;
+      alt.id = (alt.text) ? alt.id || 'qrcode-description' : null;
+
+      // Compose title property surrogate
+      title = (typeof title === 'string') ? {text: title} : title || {};
+      title.text = title.text || null;
+      title.id = (title.text) ? title.id || 'qrcode-title' : null;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var c, mc, r, mr, qrSvg='', rect;
+
+      rect = 'l' + cellSize + ',0 0,' + cellSize +
+        ' -' + cellSize + ',0 0,-' + cellSize + 'z ';
+
+      qrSvg += '<svg version="1.1" xmlns="http://www.w3.org/2000/svg"';
+      qrSvg += !opts.scalable ? ' width="' + size + 'px" height="' + size + 'px"' : '';
+      qrSvg += ' viewBox="0 0 ' + size + ' ' + size + '" ';
+      qrSvg += ' preserveAspectRatio="xMinYMin meet"';
+      qrSvg += (title.text || alt.text) ? ' role="img" aria-labelledby="' +
+          escapeXml([title.id, alt.id].join(' ').trim() ) + '"' : '';
+      qrSvg += '>';
+      qrSvg += (title.text) ? '<title id="' + escapeXml(title.id) + '">' +
+          escapeXml(title.text) + '</title>' : '';
+      qrSvg += (alt.text) ? '<description id="' + escapeXml(alt.id) + '">' +
+          escapeXml(alt.text) + '</description>' : '';
+      qrSvg += '<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>';
+      qrSvg += '<path d="';
+
+      for (r = 0; r < _this.getModuleCount(); r += 1) {
+        mr = r * cellSize + margin;
+        for (c = 0; c < _this.getModuleCount(); c += 1) {
+          if (_this.isDark(r, c) ) {
+            mc = c*cellSize+margin;
+            qrSvg += 'M' + mc + ',' + mr + rect;
+          }
+        }
+      }
+
+      qrSvg += '" stroke="transparent" fill="black"/>';
+      qrSvg += '</svg>';
+
+      return qrSvg;
+    };
+
+    _this.createDataURL = function(cellSize, margin) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      return createDataURL(size, size, function(x, y) {
+        if (min <= x && x < max && min <= y && y < max) {
+          var c = Math.floor( (x - min) / cellSize);
+          var r = Math.floor( (y - min) / cellSize);
+          return _this.isDark(r, c)? 0 : 1;
+        } else {
+          return 1;
+        }
+      } );
+    };
+
+    _this.createImgTag = function(cellSize, margin, alt) {
+
+      cellSize = cellSize || 2;
+      margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+
+      var img = '';
+      img += '<img';
+      img += '\u0020src="';
+      img += _this.createDataURL(cellSize, margin);
+      img += '"';
+      img += '\u0020width="';
+      img += size;
+      img += '"';
+      img += '\u0020height="';
+      img += size;
+      img += '"';
+      if (alt) {
+        img += '\u0020alt="';
+        img += escapeXml(alt);
+        img += '"';
+      }
+      img += '/>';
+
+      return img;
+    };
+
+    var escapeXml = function(s) {
+      var escaped = '';
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charAt(i);
+        switch(c) {
+        case '<': escaped += '&lt;'; break;
+        case '>': escaped += '&gt;'; break;
+        case '&': escaped += '&amp;'; break;
+        case '"': escaped += '&quot;'; break;
+        default : escaped += c; break;
+        }
+      }
+      return escaped;
+    };
+
+    var _createHalfASCII = function(margin) {
+      var cellSize = 1;
+      margin = (typeof margin == 'undefined')? cellSize * 2 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      var y, x, r1, r2, p;
+
+      var blocks = {
+        '██': '█',
+        '█ ': '▀',
+        ' █': '▄',
+        '  ': ' '
+      };
+
+      var blocksLastLineNoMargin = {
+        '██': '▀',
+        '█ ': '▀',
+        ' █': ' ',
+        '  ': ' '
+      };
+
+      var ascii = '';
+      for (y = 0; y < size; y += 2) {
+        r1 = Math.floor((y - min) / cellSize);
+        r2 = Math.floor((y + 1 - min) / cellSize);
+        for (x = 0; x < size; x += 1) {
+          p = '█';
+
+          if (min <= x && x < max && min <= y && y < max && _this.isDark(r1, Math.floor((x - min) / cellSize))) {
+            p = ' ';
+          }
+
+          if (min <= x && x < max && min <= y+1 && y+1 < max && _this.isDark(r2, Math.floor((x - min) / cellSize))) {
+            p += ' ';
+          }
+          else {
+            p += '█';
+          }
+
+          // Output 2 characters per pixel, to create full square. 1 character per pixels gives only half width of square.
+          ascii += (margin < 1 && y+1 >= max) ? blocksLastLineNoMargin[p] : blocks[p];
+        }
+
+        ascii += '\n';
+      }
+
+      if (size % 2 && margin > 0) {
+        return ascii.substring(0, ascii.length - size - 1) + Array(size+1).join('▀');
+      }
+
+      return ascii.substring(0, ascii.length-1);
+    };
+
+    _this.createASCII = function(cellSize, margin) {
+      cellSize = cellSize || 1;
+
+      if (cellSize < 2) {
+        return _createHalfASCII(margin);
+      }
+
+      cellSize -= 1;
+      margin = (typeof margin == 'undefined')? cellSize * 2 : margin;
+
+      var size = _this.getModuleCount() * cellSize + margin * 2;
+      var min = margin;
+      var max = size - margin;
+
+      var y, x, r, p;
+
+      var white = Array(cellSize+1).join('██');
+      var black = Array(cellSize+1).join('  ');
+
+      var ascii = '';
+      var line = '';
+      for (y = 0; y < size; y += 1) {
+        r = Math.floor( (y - min) / cellSize);
+        line = '';
+        for (x = 0; x < size; x += 1) {
+          p = 1;
+
+          if (min <= x && x < max && min <= y && y < max && _this.isDark(r, Math.floor((x - min) / cellSize))) {
+            p = 0;
+          }
+
+          // Output 2 characters per pixel, to create full square. 1 character per pixels gives only half width of square.
+          line += p ? white : black;
+        }
+
+        for (r = 0; r < cellSize; r += 1) {
+          ascii += line + '\n';
+        }
+      }
+
+      return ascii.substring(0, ascii.length-1);
+    };
+
+    _this.renderTo2dContext = function(context, cellSize) {
+      cellSize = cellSize || 2;
+      var length = _this.getModuleCount();
+      for (var row = 0; row < length; row++) {
+        for (var col = 0; col < length; col++) {
+          context.fillStyle = _this.isDark(row, col) ? 'black' : 'white';
+          context.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+        }
+      }
+    }
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrcode.stringToBytes
+  //---------------------------------------------------------------------
+
+  qrcode.stringToBytesFuncs = {
+    'default' : function(s) {
+      var bytes = [];
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charCodeAt(i);
+        bytes.push(c & 0xff);
+      }
+      return bytes;
+    }
+  };
+
+  qrcode.stringToBytes = qrcode.stringToBytesFuncs['default'];
+
+  //---------------------------------------------------------------------
+  // qrcode.createStringToBytes
+  //---------------------------------------------------------------------
+
+  /**
+   * @param unicodeData base64 string of byte array.
+   * [16bit Unicode],[16bit Bytes], ...
+   * @param numChars
+   */
+  qrcode.createStringToBytes = function(unicodeData, numChars) {
+
+    // create conversion map.
+
+    var unicodeMap = function() {
+
+      var bin = base64DecodeInputStream(unicodeData);
+      var read = function() {
+        var b = bin.read();
+        if (b == -1) throw 'eof';
+        return b;
+      };
+
+      var count = 0;
+      var unicodeMap = {};
+      while (true) {
+        var b0 = bin.read();
+        if (b0 == -1) break;
+        var b1 = read();
+        var b2 = read();
+        var b3 = read();
+        var k = String.fromCharCode( (b0 << 8) | b1);
+        var v = (b2 << 8) | b3;
+        unicodeMap[k] = v;
+        count += 1;
+      }
+      if (count != numChars) {
+        throw count + ' != ' + numChars;
+      }
+
+      return unicodeMap;
+    }();
+
+    var unknownChar = '?'.charCodeAt(0);
+
+    return function(s) {
+      var bytes = [];
+      for (var i = 0; i < s.length; i += 1) {
+        var c = s.charCodeAt(i);
+        if (c < 128) {
+          bytes.push(c);
+        } else {
+          var b = unicodeMap[s.charAt(i)];
+          if (typeof b == 'number') {
+            if ( (b & 0xff) == b) {
+              // 1byte
+              bytes.push(b);
+            } else {
+              // 2bytes
+              bytes.push(b >>> 8);
+              bytes.push(b & 0xff);
+            }
+          } else {
+            bytes.push(unknownChar);
+          }
+        }
+      }
+      return bytes;
+    };
+  };
+
+  //---------------------------------------------------------------------
+  // QRMode
+  //---------------------------------------------------------------------
+
+  var QRMode = {
+    MODE_NUMBER :    1 << 0,
+    MODE_ALPHA_NUM : 1 << 1,
+    MODE_8BIT_BYTE : 1 << 2,
+    MODE_KANJI :     1 << 3
+  };
+
+  //---------------------------------------------------------------------
+  // QRErrorCorrectionLevel
+  //---------------------------------------------------------------------
+
+  var QRErrorCorrectionLevel = {
+    L : 1,
+    M : 0,
+    Q : 3,
+    H : 2
+  };
+
+  //---------------------------------------------------------------------
+  // QRMaskPattern
+  //---------------------------------------------------------------------
+
+  var QRMaskPattern = {
+    PATTERN000 : 0,
+    PATTERN001 : 1,
+    PATTERN010 : 2,
+    PATTERN011 : 3,
+    PATTERN100 : 4,
+    PATTERN101 : 5,
+    PATTERN110 : 6,
+    PATTERN111 : 7
+  };
+
+  //---------------------------------------------------------------------
+  // QRUtil
+  //---------------------------------------------------------------------
+
+  var QRUtil = function() {
+
+    var PATTERN_POSITION_TABLE = [
+      [],
+      [6, 18],
+      [6, 22],
+      [6, 26],
+      [6, 30],
+      [6, 34],
+      [6, 22, 38],
+      [6, 24, 42],
+      [6, 26, 46],
+      [6, 28, 50],
+      [6, 30, 54],
+      [6, 32, 58],
+      [6, 34, 62],
+      [6, 26, 46, 66],
+      [6, 26, 48, 70],
+      [6, 26, 50, 74],
+      [6, 30, 54, 78],
+      [6, 30, 56, 82],
+      [6, 30, 58, 86],
+      [6, 34, 62, 90],
+      [6, 28, 50, 72, 94],
+      [6, 26, 50, 74, 98],
+      [6, 30, 54, 78, 102],
+      [6, 28, 54, 80, 106],
+      [6, 32, 58, 84, 110],
+      [6, 30, 58, 86, 114],
+      [6, 34, 62, 90, 118],
+      [6, 26, 50, 74, 98, 122],
+      [6, 30, 54, 78, 102, 126],
+      [6, 26, 52, 78, 104, 130],
+      [6, 30, 56, 82, 108, 134],
+      [6, 34, 60, 86, 112, 138],
+      [6, 30, 58, 86, 114, 142],
+      [6, 34, 62, 90, 118, 146],
+      [6, 30, 54, 78, 102, 126, 150],
+      [6, 24, 50, 76, 102, 128, 154],
+      [6, 28, 54, 80, 106, 132, 158],
+      [6, 32, 58, 84, 110, 136, 162],
+      [6, 26, 54, 82, 110, 138, 166],
+      [6, 30, 58, 86, 114, 142, 170]
+    ];
+    var G15 = (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0);
+    var G18 = (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0);
+    var G15_MASK = (1 << 14) | (1 << 12) | (1 << 10) | (1 << 4) | (1 << 1);
+
+    var _this = {};
+
+    var getBCHDigit = function(data) {
+      var digit = 0;
+      while (data != 0) {
+        digit += 1;
+        data >>>= 1;
+      }
+      return digit;
+    };
+
+    _this.getBCHTypeInfo = function(data) {
+      var d = data << 10;
+      while (getBCHDigit(d) - getBCHDigit(G15) >= 0) {
+        d ^= (G15 << (getBCHDigit(d) - getBCHDigit(G15) ) );
+      }
+      return ( (data << 10) | d) ^ G15_MASK;
+    };
+
+    _this.getBCHTypeNumber = function(data) {
+      var d = data << 12;
+      while (getBCHDigit(d) - getBCHDigit(G18) >= 0) {
+        d ^= (G18 << (getBCHDigit(d) - getBCHDigit(G18) ) );
+      }
+      return (data << 12) | d;
+    };
+
+    _this.getPatternPosition = function(typeNumber) {
+      return PATTERN_POSITION_TABLE[typeNumber - 1];
+    };
+
+    _this.getMaskFunction = function(maskPattern) {
+
+      switch (maskPattern) {
+
+      case QRMaskPattern.PATTERN000 :
+        return function(i, j) { return (i + j) % 2 == 0; };
+      case QRMaskPattern.PATTERN001 :
+        return function(i, j) { return i % 2 == 0; };
+      case QRMaskPattern.PATTERN010 :
+        return function(i, j) { return j % 3 == 0; };
+      case QRMaskPattern.PATTERN011 :
+        return function(i, j) { return (i + j) % 3 == 0; };
+      case QRMaskPattern.PATTERN100 :
+        return function(i, j) { return (Math.floor(i / 2) + Math.floor(j / 3) ) % 2 == 0; };
+      case QRMaskPattern.PATTERN101 :
+        return function(i, j) { return (i * j) % 2 + (i * j) % 3 == 0; };
+      case QRMaskPattern.PATTERN110 :
+        return function(i, j) { return ( (i * j) % 2 + (i * j) % 3) % 2 == 0; };
+      case QRMaskPattern.PATTERN111 :
+        return function(i, j) { return ( (i * j) % 3 + (i + j) % 2) % 2 == 0; };
+
+      default :
+        throw 'bad maskPattern:' + maskPattern;
+      }
+    };
+
+    _this.getErrorCorrectPolynomial = function(errorCorrectLength) {
+      var a = qrPolynomial([1], 0);
+      for (var i = 0; i < errorCorrectLength; i += 1) {
+        a = a.multiply(qrPolynomial([1, QRMath.gexp(i)], 0) );
+      }
+      return a;
+    };
+
+    _this.getLengthInBits = function(mode, type) {
+
+      if (1 <= type && type < 10) {
+
+        // 1 - 9
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 10;
+        case QRMode.MODE_ALPHA_NUM : return 9;
+        case QRMode.MODE_8BIT_BYTE : return 8;
+        case QRMode.MODE_KANJI     : return 8;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else if (type < 27) {
+
+        // 10 - 26
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 12;
+        case QRMode.MODE_ALPHA_NUM : return 11;
+        case QRMode.MODE_8BIT_BYTE : return 16;
+        case QRMode.MODE_KANJI     : return 10;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else if (type < 41) {
+
+        // 27 - 40
+
+        switch(mode) {
+        case QRMode.MODE_NUMBER    : return 14;
+        case QRMode.MODE_ALPHA_NUM : return 13;
+        case QRMode.MODE_8BIT_BYTE : return 16;
+        case QRMode.MODE_KANJI     : return 12;
+        default :
+          throw 'mode:' + mode;
+        }
+
+      } else {
+        throw 'type:' + type;
+      }
+    };
+
+    _this.getLostPoint = function(qrcode) {
+
+      var moduleCount = qrcode.getModuleCount();
+
+      var lostPoint = 0;
+
+      // LEVEL1
+
+      for (var row = 0; row < moduleCount; row += 1) {
+        for (var col = 0; col < moduleCount; col += 1) {
+
+          var sameCount = 0;
+          var dark = qrcode.isDark(row, col);
+
+          for (var r = -1; r <= 1; r += 1) {
+
+            if (row + r < 0 || moduleCount <= row + r) {
+              continue;
+            }
+
+            for (var c = -1; c <= 1; c += 1) {
+
+              if (col + c < 0 || moduleCount <= col + c) {
+                continue;
+              }
+
+              if (r == 0 && c == 0) {
+                continue;
+              }
+
+              if (dark == qrcode.isDark(row + r, col + c) ) {
+                sameCount += 1;
+              }
+            }
+          }
+
+          if (sameCount > 5) {
+            lostPoint += (3 + sameCount - 5);
+          }
+        }
+      };
+
+      // LEVEL2
+
+      for (var row = 0; row < moduleCount - 1; row += 1) {
+        for (var col = 0; col < moduleCount - 1; col += 1) {
+          var count = 0;
+          if (qrcode.isDark(row, col) ) count += 1;
+          if (qrcode.isDark(row + 1, col) ) count += 1;
+          if (qrcode.isDark(row, col + 1) ) count += 1;
+          if (qrcode.isDark(row + 1, col + 1) ) count += 1;
+          if (count == 0 || count == 4) {
+            lostPoint += 3;
+          }
+        }
+      }
+
+      // LEVEL3
+
+      for (var row = 0; row < moduleCount; row += 1) {
+        for (var col = 0; col < moduleCount - 6; col += 1) {
+          if (qrcode.isDark(row, col)
+              && !qrcode.isDark(row, col + 1)
+              &&  qrcode.isDark(row, col + 2)
+              &&  qrcode.isDark(row, col + 3)
+              &&  qrcode.isDark(row, col + 4)
+              && !qrcode.isDark(row, col + 5)
+              &&  qrcode.isDark(row, col + 6) ) {
+            lostPoint += 40;
+          }
+        }
+      }
+
+      for (var col = 0; col < moduleCount; col += 1) {
+        for (var row = 0; row < moduleCount - 6; row += 1) {
+          if (qrcode.isDark(row, col)
+              && !qrcode.isDark(row + 1, col)
+              &&  qrcode.isDark(row + 2, col)
+              &&  qrcode.isDark(row + 3, col)
+              &&  qrcode.isDark(row + 4, col)
+              && !qrcode.isDark(row + 5, col)
+              &&  qrcode.isDark(row + 6, col) ) {
+            lostPoint += 40;
+          }
+        }
+      }
+
+      // LEVEL4
+
+      var darkCount = 0;
+
+      for (var col = 0; col < moduleCount; col += 1) {
+        for (var row = 0; row < moduleCount; row += 1) {
+          if (qrcode.isDark(row, col) ) {
+            darkCount += 1;
+          }
+        }
+      }
+
+      var ratio = Math.abs(100 * darkCount / moduleCount / moduleCount - 50) / 5;
+      lostPoint += ratio * 10;
+
+      return lostPoint;
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // QRMath
+  //---------------------------------------------------------------------
+
+  var QRMath = function() {
+
+    var EXP_TABLE = new Array(256);
+    var LOG_TABLE = new Array(256);
+
+    // initialize tables
+    for (var i = 0; i < 8; i += 1) {
+      EXP_TABLE[i] = 1 << i;
+    }
+    for (var i = 8; i < 256; i += 1) {
+      EXP_TABLE[i] = EXP_TABLE[i - 4]
+        ^ EXP_TABLE[i - 5]
+        ^ EXP_TABLE[i - 6]
+        ^ EXP_TABLE[i - 8];
+    }
+    for (var i = 0; i < 255; i += 1) {
+      LOG_TABLE[EXP_TABLE[i] ] = i;
+    }
+
+    var _this = {};
+
+    _this.glog = function(n) {
+
+      if (n < 1) {
+        throw 'glog(' + n + ')';
+      }
+
+      return LOG_TABLE[n];
+    };
+
+    _this.gexp = function(n) {
+
+      while (n < 0) {
+        n += 255;
+      }
+
+      while (n >= 256) {
+        n -= 255;
+      }
+
+      return EXP_TABLE[n];
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // qrPolynomial
+  //---------------------------------------------------------------------
+
+  function qrPolynomial(num, shift) {
+
+    if (typeof num.length == 'undefined') {
+      throw num.length + '/' + shift;
+    }
+
+    var _num = function() {
+      var offset = 0;
+      while (offset < num.length && num[offset] == 0) {
+        offset += 1;
+      }
+      var _num = new Array(num.length - offset + shift);
+      for (var i = 0; i < num.length - offset; i += 1) {
+        _num[i] = num[i + offset];
+      }
+      return _num;
+    }();
+
+    var _this = {};
+
+    _this.getAt = function(index) {
+      return _num[index];
+    };
+
+    _this.getLength = function() {
+      return _num.length;
+    };
+
+    _this.multiply = function(e) {
+
+      var num = new Array(_this.getLength() + e.getLength() - 1);
+
+      for (var i = 0; i < _this.getLength(); i += 1) {
+        for (var j = 0; j < e.getLength(); j += 1) {
+          num[i + j] ^= QRMath.gexp(QRMath.glog(_this.getAt(i) ) + QRMath.glog(e.getAt(j) ) );
+        }
+      }
+
+      return qrPolynomial(num, 0);
+    };
+
+    _this.mod = function(e) {
+
+      if (_this.getLength() - e.getLength() < 0) {
+        return _this;
+      }
+
+      var ratio = QRMath.glog(_this.getAt(0) ) - QRMath.glog(e.getAt(0) );
+
+      var num = new Array(_this.getLength() );
+      for (var i = 0; i < _this.getLength(); i += 1) {
+        num[i] = _this.getAt(i);
+      }
+
+      for (var i = 0; i < e.getLength(); i += 1) {
+        num[i] ^= QRMath.gexp(QRMath.glog(e.getAt(i) ) + ratio);
+      }
+
+      // recursive call
+      return qrPolynomial(num, 0).mod(e);
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // QRRSBlock
+  //---------------------------------------------------------------------
+
+  var QRRSBlock = function() {
+
+    var RS_BLOCK_TABLE = [
+
+      // L
+      // M
+      // Q
+      // H
+
+      // 1
+      [1, 26, 19],
+      [1, 26, 16],
+      [1, 26, 13],
+      [1, 26, 9],
+
+      // 2
+      [1, 44, 34],
+      [1, 44, 28],
+      [1, 44, 22],
+      [1, 44, 16],
+
+      // 3
+      [1, 70, 55],
+      [1, 70, 44],
+      [2, 35, 17],
+      [2, 35, 13],
+
+      // 4
+      [1, 100, 80],
+      [2, 50, 32],
+      [2, 50, 24],
+      [4, 25, 9],
+
+      // 5
+      [1, 134, 108],
+      [2, 67, 43],
+      [2, 33, 15, 2, 34, 16],
+      [2, 33, 11, 2, 34, 12],
+
+      // 6
+      [2, 86, 68],
+      [4, 43, 27],
+      [4, 43, 19],
+      [4, 43, 15],
+
+      // 7
+      [2, 98, 78],
+      [4, 49, 31],
+      [2, 32, 14, 4, 33, 15],
+      [4, 39, 13, 1, 40, 14],
+
+      // 8
+      [2, 121, 97],
+      [2, 60, 38, 2, 61, 39],
+      [4, 40, 18, 2, 41, 19],
+      [4, 40, 14, 2, 41, 15],
+
+      // 9
+      [2, 146, 116],
+      [3, 58, 36, 2, 59, 37],
+      [4, 36, 16, 4, 37, 17],
+      [4, 36, 12, 4, 37, 13],
+
+      // 10
+      [2, 86, 68, 2, 87, 69],
+      [4, 69, 43, 1, 70, 44],
+      [6, 43, 19, 2, 44, 20],
+      [6, 43, 15, 2, 44, 16],
+
+      // 11
+      [4, 101, 81],
+      [1, 80, 50, 4, 81, 51],
+      [4, 50, 22, 4, 51, 23],
+      [3, 36, 12, 8, 37, 13],
+
+      // 12
+      [2, 116, 92, 2, 117, 93],
+      [6, 58, 36, 2, 59, 37],
+      [4, 46, 20, 6, 47, 21],
+      [7, 42, 14, 4, 43, 15],
+
+      // 13
+      [4, 133, 107],
+      [8, 59, 37, 1, 60, 38],
+      [8, 44, 20, 4, 45, 21],
+      [12, 33, 11, 4, 34, 12],
+
+      // 14
+      [3, 145, 115, 1, 146, 116],
+      [4, 64, 40, 5, 65, 41],
+      [11, 36, 16, 5, 37, 17],
+      [11, 36, 12, 5, 37, 13],
+
+      // 15
+      [5, 109, 87, 1, 110, 88],
+      [5, 65, 41, 5, 66, 42],
+      [5, 54, 24, 7, 55, 25],
+      [11, 36, 12, 7, 37, 13],
+
+      // 16
+      [5, 122, 98, 1, 123, 99],
+      [7, 73, 45, 3, 74, 46],
+      [15, 43, 19, 2, 44, 20],
+      [3, 45, 15, 13, 46, 16],
+
+      // 17
+      [1, 135, 107, 5, 136, 108],
+      [10, 74, 46, 1, 75, 47],
+      [1, 50, 22, 15, 51, 23],
+      [2, 42, 14, 17, 43, 15],
+
+      // 18
+      [5, 150, 120, 1, 151, 121],
+      [9, 69, 43, 4, 70, 44],
+      [17, 50, 22, 1, 51, 23],
+      [2, 42, 14, 19, 43, 15],
+
+      // 19
+      [3, 141, 113, 4, 142, 114],
+      [3, 70, 44, 11, 71, 45],
+      [17, 47, 21, 4, 48, 22],
+      [9, 39, 13, 16, 40, 14],
+
+      // 20
+      [3, 135, 107, 5, 136, 108],
+      [3, 67, 41, 13, 68, 42],
+      [15, 54, 24, 5, 55, 25],
+      [15, 43, 15, 10, 44, 16],
+
+      // 21
+      [4, 144, 116, 4, 145, 117],
+      [17, 68, 42],
+      [17, 50, 22, 6, 51, 23],
+      [19, 46, 16, 6, 47, 17],
+
+      // 22
+      [2, 139, 111, 7, 140, 112],
+      [17, 74, 46],
+      [7, 54, 24, 16, 55, 25],
+      [34, 37, 13],
+
+      // 23
+      [4, 151, 121, 5, 152, 122],
+      [4, 75, 47, 14, 76, 48],
+      [11, 54, 24, 14, 55, 25],
+      [16, 45, 15, 14, 46, 16],
+
+      // 24
+      [6, 147, 117, 4, 148, 118],
+      [6, 73, 45, 14, 74, 46],
+      [11, 54, 24, 16, 55, 25],
+      [30, 46, 16, 2, 47, 17],
+
+      // 25
+      [8, 132, 106, 4, 133, 107],
+      [8, 75, 47, 13, 76, 48],
+      [7, 54, 24, 22, 55, 25],
+      [22, 45, 15, 13, 46, 16],
+
+      // 26
+      [10, 142, 114, 2, 143, 115],
+      [19, 74, 46, 4, 75, 47],
+      [28, 50, 22, 6, 51, 23],
+      [33, 46, 16, 4, 47, 17],
+
+      // 27
+      [8, 152, 122, 4, 153, 123],
+      [22, 73, 45, 3, 74, 46],
+      [8, 53, 23, 26, 54, 24],
+      [12, 45, 15, 28, 46, 16],
+
+      // 28
+      [3, 147, 117, 10, 148, 118],
+      [3, 73, 45, 23, 74, 46],
+      [4, 54, 24, 31, 55, 25],
+      [11, 45, 15, 31, 46, 16],
+
+      // 29
+      [7, 146, 116, 7, 147, 117],
+      [21, 73, 45, 7, 74, 46],
+      [1, 53, 23, 37, 54, 24],
+      [19, 45, 15, 26, 46, 16],
+
+      // 30
+      [5, 145, 115, 10, 146, 116],
+      [19, 75, 47, 10, 76, 48],
+      [15, 54, 24, 25, 55, 25],
+      [23, 45, 15, 25, 46, 16],
+
+      // 31
+      [13, 145, 115, 3, 146, 116],
+      [2, 74, 46, 29, 75, 47],
+      [42, 54, 24, 1, 55, 25],
+      [23, 45, 15, 28, 46, 16],
+
+      // 32
+      [17, 145, 115],
+      [10, 74, 46, 23, 75, 47],
+      [10, 54, 24, 35, 55, 25],
+      [19, 45, 15, 35, 46, 16],
+
+      // 33
+      [17, 145, 115, 1, 146, 116],
+      [14, 74, 46, 21, 75, 47],
+      [29, 54, 24, 19, 55, 25],
+      [11, 45, 15, 46, 46, 16],
+
+      // 34
+      [13, 145, 115, 6, 146, 116],
+      [14, 74, 46, 23, 75, 47],
+      [44, 54, 24, 7, 55, 25],
+      [59, 46, 16, 1, 47, 17],
+
+      // 35
+      [12, 151, 121, 7, 152, 122],
+      [12, 75, 47, 26, 76, 48],
+      [39, 54, 24, 14, 55, 25],
+      [22, 45, 15, 41, 46, 16],
+
+      // 36
+      [6, 151, 121, 14, 152, 122],
+      [6, 75, 47, 34, 76, 48],
+      [46, 54, 24, 10, 55, 25],
+      [2, 45, 15, 64, 46, 16],
+
+      // 37
+      [17, 152, 122, 4, 153, 123],
+      [29, 74, 46, 14, 75, 47],
+      [49, 54, 24, 10, 55, 25],
+      [24, 45, 15, 46, 46, 16],
+
+      // 38
+      [4, 152, 122, 18, 153, 123],
+      [13, 74, 46, 32, 75, 47],
+      [48, 54, 24, 14, 55, 25],
+      [42, 45, 15, 32, 46, 16],
+
+      // 39
+      [20, 147, 117, 4, 148, 118],
+      [40, 75, 47, 7, 76, 48],
+      [43, 54, 24, 22, 55, 25],
+      [10, 45, 15, 67, 46, 16],
+
+      // 40
+      [19, 148, 118, 6, 149, 119],
+      [18, 75, 47, 31, 76, 48],
+      [34, 54, 24, 34, 55, 25],
+      [20, 45, 15, 61, 46, 16]
+    ];
+
+    var qrRSBlock = function(totalCount, dataCount) {
+      var _this = {};
+      _this.totalCount = totalCount;
+      _this.dataCount = dataCount;
+      return _this;
+    };
+
+    var _this = {};
+
+    var getRsBlockTable = function(typeNumber, errorCorrectionLevel) {
+
+      switch(errorCorrectionLevel) {
+      case QRErrorCorrectionLevel.L :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 0];
+      case QRErrorCorrectionLevel.M :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 1];
+      case QRErrorCorrectionLevel.Q :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 2];
+      case QRErrorCorrectionLevel.H :
+        return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 3];
+      default :
+        return undefined;
+      }
+    };
+
+    _this.getRSBlocks = function(typeNumber, errorCorrectionLevel) {
+
+      var rsBlock = getRsBlockTable(typeNumber, errorCorrectionLevel);
+
+      if (typeof rsBlock == 'undefined') {
+        throw 'bad rs block @ typeNumber:' + typeNumber +
+            '/errorCorrectionLevel:' + errorCorrectionLevel;
+      }
+
+      var length = rsBlock.length / 3;
+
+      var list = [];
+
+      for (var i = 0; i < length; i += 1) {
+
+        var count = rsBlock[i * 3 + 0];
+        var totalCount = rsBlock[i * 3 + 1];
+        var dataCount = rsBlock[i * 3 + 2];
+
+        for (var j = 0; j < count; j += 1) {
+          list.push(qrRSBlock(totalCount, dataCount) );
+        }
+      }
+
+      return list;
+    };
+
+    return _this;
+  }();
+
+  //---------------------------------------------------------------------
+  // qrBitBuffer
+  //---------------------------------------------------------------------
+
+  var qrBitBuffer = function() {
+
+    var _buffer = [];
+    var _length = 0;
+
+    var _this = {};
+
+    _this.getBuffer = function() {
+      return _buffer;
+    };
+
+    _this.getAt = function(index) {
+      var bufIndex = Math.floor(index / 8);
+      return ( (_buffer[bufIndex] >>> (7 - index % 8) ) & 1) == 1;
+    };
+
+    _this.put = function(num, length) {
+      for (var i = 0; i < length; i += 1) {
+        _this.putBit( ( (num >>> (length - i - 1) ) & 1) == 1);
+      }
+    };
+
+    _this.getLengthInBits = function() {
+      return _length;
+    };
+
+    _this.putBit = function(bit) {
+
+      var bufIndex = Math.floor(_length / 8);
+      if (_buffer.length <= bufIndex) {
+        _buffer.push(0);
+      }
+
+      if (bit) {
+        _buffer[bufIndex] |= (0x80 >>> (_length % 8) );
+      }
+
+      _length += 1;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrNumber
+  //---------------------------------------------------------------------
+
+  var qrNumber = function(data) {
+
+    var _mode = QRMode.MODE_NUMBER;
+    var _data = data;
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _data.length;
+    };
+
+    _this.write = function(buffer) {
+
+      var data = _data;
+
+      var i = 0;
+
+      while (i + 2 < data.length) {
+        buffer.put(strToNum(data.substring(i, i + 3) ), 10);
+        i += 3;
+      }
+
+      if (i < data.length) {
+        if (data.length - i == 1) {
+          buffer.put(strToNum(data.substring(i, i + 1) ), 4);
+        } else if (data.length - i == 2) {
+          buffer.put(strToNum(data.substring(i, i + 2) ), 7);
+        }
+      }
+    };
+
+    var strToNum = function(s) {
+      var num = 0;
+      for (var i = 0; i < s.length; i += 1) {
+        num = num * 10 + chatToNum(s.charAt(i) );
+      }
+      return num;
+    };
+
+    var chatToNum = function(c) {
+      if ('0' <= c && c <= '9') {
+        return c.charCodeAt(0) - '0'.charCodeAt(0);
+      }
+      throw 'illegal char :' + c;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrAlphaNum
+  //---------------------------------------------------------------------
+
+  var qrAlphaNum = function(data) {
+
+    var _mode = QRMode.MODE_ALPHA_NUM;
+    var _data = data;
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _data.length;
+    };
+
+    _this.write = function(buffer) {
+
+      var s = _data;
+
+      var i = 0;
+
+      while (i + 1 < s.length) {
+        buffer.put(
+          getCode(s.charAt(i) ) * 45 +
+          getCode(s.charAt(i + 1) ), 11);
+        i += 2;
+      }
+
+      if (i < s.length) {
+        buffer.put(getCode(s.charAt(i) ), 6);
+      }
+    };
+
+    var getCode = function(c) {
+
+      if ('0' <= c && c <= '9') {
+        return c.charCodeAt(0) - '0'.charCodeAt(0);
+      } else if ('A' <= c && c <= 'Z') {
+        return c.charCodeAt(0) - 'A'.charCodeAt(0) + 10;
+      } else {
+        switch (c) {
+        case ' ' : return 36;
+        case '$' : return 37;
+        case '%' : return 38;
+        case '*' : return 39;
+        case '+' : return 40;
+        case '-' : return 41;
+        case '.' : return 42;
+        case '/' : return 43;
+        case ':' : return 44;
+        default :
+          throw 'illegal char :' + c;
+        }
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qr8BitByte
+  //---------------------------------------------------------------------
+
+  var qr8BitByte = function(data) {
+
+    var _mode = QRMode.MODE_8BIT_BYTE;
+    var _data = data;
+    var _bytes = qrcode.stringToBytes(data);
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return _bytes.length;
+    };
+
+    _this.write = function(buffer) {
+      for (var i = 0; i < _bytes.length; i += 1) {
+        buffer.put(_bytes[i], 8);
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // qrKanji
+  //---------------------------------------------------------------------
+
+  var qrKanji = function(data) {
+
+    var _mode = QRMode.MODE_KANJI;
+    var _data = data;
+
+    var stringToBytes = qrcode.stringToBytesFuncs['SJIS'];
+    if (!stringToBytes) {
+      throw 'sjis not supported.';
+    }
+    !function(c, code) {
+      // self test for sjis support.
+      var test = stringToBytes(c);
+      if (test.length != 2 || ( (test[0] << 8) | test[1]) != code) {
+        throw 'sjis not supported.';
+      }
+    }('\u53cb', 0x9746);
+
+    var _bytes = stringToBytes(data);
+
+    var _this = {};
+
+    _this.getMode = function() {
+      return _mode;
+    };
+
+    _this.getLength = function(buffer) {
+      return ~~(_bytes.length / 2);
+    };
+
+    _this.write = function(buffer) {
+
+      var data = _bytes;
+
+      var i = 0;
+
+      while (i + 1 < data.length) {
+
+        var c = ( (0xff & data[i]) << 8) | (0xff & data[i + 1]);
+
+        if (0x8140 <= c && c <= 0x9FFC) {
+          c -= 0x8140;
+        } else if (0xE040 <= c && c <= 0xEBBF) {
+          c -= 0xC140;
+        } else {
+          throw 'illegal char at ' + (i + 1) + '/' + c;
+        }
+
+        c = ( (c >>> 8) & 0xff) * 0xC0 + (c & 0xff);
+
+        buffer.put(c, 13);
+
+        i += 2;
+      }
+
+      if (i < data.length) {
+        throw 'illegal char at ' + (i + 1);
+      }
+    };
+
+    return _this;
+  };
+
+  //=====================================================================
+  // GIF Support etc.
+  //
+
+  //---------------------------------------------------------------------
+  // byteArrayOutputStream
+  //---------------------------------------------------------------------
+
+  var byteArrayOutputStream = function() {
+
+    var _bytes = [];
+
+    var _this = {};
+
+    _this.writeByte = function(b) {
+      _bytes.push(b & 0xff);
+    };
+
+    _this.writeShort = function(i) {
+      _this.writeByte(i);
+      _this.writeByte(i >>> 8);
+    };
+
+    _this.writeBytes = function(b, off, len) {
+      off = off || 0;
+      len = len || b.length;
+      for (var i = 0; i < len; i += 1) {
+        _this.writeByte(b[i + off]);
+      }
+    };
+
+    _this.writeString = function(s) {
+      for (var i = 0; i < s.length; i += 1) {
+        _this.writeByte(s.charCodeAt(i) );
+      }
+    };
+
+    _this.toByteArray = function() {
+      return _bytes;
+    };
+
+    _this.toString = function() {
+      var s = '';
+      s += '[';
+      for (var i = 0; i < _bytes.length; i += 1) {
+        if (i > 0) {
+          s += ',';
+        }
+        s += _bytes[i];
+      }
+      s += ']';
+      return s;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // base64EncodeOutputStream
+  //---------------------------------------------------------------------
+
+  var base64EncodeOutputStream = function() {
+
+    var _buffer = 0;
+    var _buflen = 0;
+    var _length = 0;
+    var _base64 = '';
+
+    var _this = {};
+
+    var writeEncoded = function(b) {
+      _base64 += String.fromCharCode(encode(b & 0x3f) );
+    };
+
+    var encode = function(n) {
+      if (n < 0) {
+        // error.
+      } else if (n < 26) {
+        return 0x41 + n;
+      } else if (n < 52) {
+        return 0x61 + (n - 26);
+      } else if (n < 62) {
+        return 0x30 + (n - 52);
+      } else if (n == 62) {
+        return 0x2b;
+      } else if (n == 63) {
+        return 0x2f;
+      }
+      throw 'n:' + n;
+    };
+
+    _this.writeByte = function(n) {
+
+      _buffer = (_buffer << 8) | (n & 0xff);
+      _buflen += 8;
+      _length += 1;
+
+      while (_buflen >= 6) {
+        writeEncoded(_buffer >>> (_buflen - 6) );
+        _buflen -= 6;
+      }
+    };
+
+    _this.flush = function() {
+
+      if (_buflen > 0) {
+        writeEncoded(_buffer << (6 - _buflen) );
+        _buffer = 0;
+        _buflen = 0;
+      }
+
+      if (_length % 3 != 0) {
+        // padding
+        var padlen = 3 - _length % 3;
+        for (var i = 0; i < padlen; i += 1) {
+          _base64 += '=';
+        }
+      }
+    };
+
+    _this.toString = function() {
+      return _base64;
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // base64DecodeInputStream
+  //---------------------------------------------------------------------
+
+  var base64DecodeInputStream = function(str) {
+
+    var _str = str;
+    var _pos = 0;
+    var _buffer = 0;
+    var _buflen = 0;
+
+    var _this = {};
+
+    _this.read = function() {
+
+      while (_buflen < 8) {
+
+        if (_pos >= _str.length) {
+          if (_buflen == 0) {
+            return -1;
+          }
+          throw 'unexpected end of file./' + _buflen;
+        }
+
+        var c = _str.charAt(_pos);
+        _pos += 1;
+
+        if (c == '=') {
+          _buflen = 0;
+          return -1;
+        } else if (c.match(/^\s$/) ) {
+          // ignore if whitespace.
+          continue;
+        }
+
+        _buffer = (_buffer << 6) | decode(c.charCodeAt(0) );
+        _buflen += 6;
+      }
+
+      var n = (_buffer >>> (_buflen - 8) ) & 0xff;
+      _buflen -= 8;
+      return n;
+    };
+
+    var decode = function(c) {
+      if (0x41 <= c && c <= 0x5a) {
+        return c - 0x41;
+      } else if (0x61 <= c && c <= 0x7a) {
+        return c - 0x61 + 26;
+      } else if (0x30 <= c && c <= 0x39) {
+        return c - 0x30 + 52;
+      } else if (c == 0x2b) {
+        return 62;
+      } else if (c == 0x2f) {
+        return 63;
+      } else {
+        throw 'c:' + c;
+      }
+    };
+
+    return _this;
+  };
+
+  //---------------------------------------------------------------------
+  // gifImage (B/W)
+  //---------------------------------------------------------------------
+
+  var gifImage = function(width, height) {
+
+    var _width = width;
+    var _height = height;
+    var _data = new Array(width * height);
+
+    var _this = {};
+
+    _this.setPixel = function(x, y, pixel) {
+      _data[y * _width + x] = pixel;
+    };
+
+    _this.write = function(out) {
+
+      //---------------------------------
+      // GIF Signature
+
+      out.writeString('GIF87a');
+
+      //---------------------------------
+      // Screen Descriptor
+
+      out.writeShort(_width);
+      out.writeShort(_height);
+
+      out.writeByte(0x80); // 2bit
+      out.writeByte(0);
+      out.writeByte(0);
+
+      //---------------------------------
+      // Global Color Map
+
+      // black
+      out.writeByte(0x00);
+      out.writeByte(0x00);
+      out.writeByte(0x00);
+
+      // white
+      out.writeByte(0xff);
+      out.writeByte(0xff);
+      out.writeByte(0xff);
+
+      //---------------------------------
+      // Image Descriptor
+
+      out.writeString(',');
+      out.writeShort(0);
+      out.writeShort(0);
+      out.writeShort(_width);
+      out.writeShort(_height);
+      out.writeByte(0);
+
+      //---------------------------------
+      // Local Color Map
+
+      //---------------------------------
+      // Raster Data
+
+      var lzwMinCodeSize = 2;
+      var raster = getLZWRaster(lzwMinCodeSize);
+
+      out.writeByte(lzwMinCodeSize);
+
+      var offset = 0;
+
+      while (raster.length - offset > 255) {
+        out.writeByte(255);
+        out.writeBytes(raster, offset, 255);
+        offset += 255;
+      }
+
+      out.writeByte(raster.length - offset);
+      out.writeBytes(raster, offset, raster.length - offset);
+      out.writeByte(0x00);
+
+      //---------------------------------
+      // GIF Terminator
+      out.writeString(';');
+    };
+
+    var bitOutputStream = function(out) {
+
+      var _out = out;
+      var _bitLength = 0;
+      var _bitBuffer = 0;
+
+      var _this = {};
+
+      _this.write = function(data, length) {
+
+        if ( (data >>> length) != 0) {
+          throw 'length over';
+        }
+
+        while (_bitLength + length >= 8) {
+          _out.writeByte(0xff & ( (data << _bitLength) | _bitBuffer) );
+          length -= (8 - _bitLength);
+          data >>>= (8 - _bitLength);
+          _bitBuffer = 0;
+          _bitLength = 0;
+        }
+
+        _bitBuffer = (data << _bitLength) | _bitBuffer;
+        _bitLength = _bitLength + length;
+      };
+
+      _this.flush = function() {
+        if (_bitLength > 0) {
+          _out.writeByte(_bitBuffer);
+        }
+      };
+
+      return _this;
+    };
+
+    var getLZWRaster = function(lzwMinCodeSize) {
+
+      var clearCode = 1 << lzwMinCodeSize;
+      var endCode = (1 << lzwMinCodeSize) + 1;
+      var bitLength = lzwMinCodeSize + 1;
+
+      // Setup LZWTable
+      var table = lzwTable();
+
+      for (var i = 0; i < clearCode; i += 1) {
+        table.add(String.fromCharCode(i) );
+      }
+      table.add(String.fromCharCode(clearCode) );
+      table.add(String.fromCharCode(endCode) );
+
+      var byteOut = byteArrayOutputStream();
+      var bitOut = bitOutputStream(byteOut);
+
+      // clear code
+      bitOut.write(clearCode, bitLength);
+
+      var dataIndex = 0;
+
+      var s = String.fromCharCode(_data[dataIndex]);
+      dataIndex += 1;
+
+      while (dataIndex < _data.length) {
+
+        var c = String.fromCharCode(_data[dataIndex]);
+        dataIndex += 1;
+
+        if (table.contains(s + c) ) {
+
+          s = s + c;
+
+        } else {
+
+          bitOut.write(table.indexOf(s), bitLength);
+
+          if (table.size() < 0xfff) {
+
+            if (table.size() == (1 << bitLength) ) {
+              bitLength += 1;
+            }
+
+            table.add(s + c);
+          }
+
+          s = c;
+        }
+      }
+
+      bitOut.write(table.indexOf(s), bitLength);
+
+      // end code
+      bitOut.write(endCode, bitLength);
+
+      bitOut.flush();
+
+      return byteOut.toByteArray();
+    };
+
+    var lzwTable = function() {
+
+      var _map = {};
+      var _size = 0;
+
+      var _this = {};
+
+      _this.add = function(key) {
+        if (_this.contains(key) ) {
+          throw 'dup key:' + key;
+        }
+        _map[key] = _size;
+        _size += 1;
+      };
+
+      _this.size = function() {
+        return _size;
+      };
+
+      _this.indexOf = function(key) {
+        return _map[key];
+      };
+
+      _this.contains = function(key) {
+        return typeof _map[key] != 'undefined';
+      };
+
+      return _this;
+    };
+
+    return _this;
+  };
+
+  var createDataURL = function(width, height, getPixel) {
+    var gif = gifImage(width, height);
+    for (var y = 0; y < height; y += 1) {
+      for (var x = 0; x < width; x += 1) {
+        gif.setPixel(x, y, getPixel(x, y) );
+      }
+    }
+
+    var b = byteArrayOutputStream();
+    gif.write(b);
+
+    var base64 = base64EncodeOutputStream();
+    var bytes = b.toByteArray();
+    for (var i = 0; i < bytes.length; i += 1) {
+      base64.writeByte(bytes[i]);
+    }
+    base64.flush();
+
+    return 'data:image/gif;base64,' + base64;
+  };
+
+  //---------------------------------------------------------------------
+  // returns qrcode function.
+
+  return qrcode;
+}();
+
+// multibyte support
+!function() {
+
+  qrcode.stringToBytesFuncs['UTF-8'] = function(s) {
+    // http://stackoverflow.com/questions/18729405/how-to-convert-utf8-string-to-byte-array
+    function toUTF8Array(str) {
+      var utf8 = [];
+      for (var i=0; i < str.length; i++) {
+        var charcode = str.charCodeAt(i);
+        if (charcode < 0x80) utf8.push(charcode);
+        else if (charcode < 0x800) {
+          utf8.push(0xc0 | (charcode >> 6),
+              0x80 | (charcode & 0x3f));
+        }
+        else if (charcode < 0xd800 || charcode >= 0xe000) {
+          utf8.push(0xe0 | (charcode >> 12),
+              0x80 | ((charcode>>6) & 0x3f),
+              0x80 | (charcode & 0x3f));
+        }
+        // surrogate pair
+        else {
+          i++;
+          // UTF-16 encodes 0x10000-0x10FFFF by
+          // subtracting 0x10000 and splitting the
+          // 20 bits of 0x0-0xFFFFF into two halves
+          charcode = 0x10000 + (((charcode & 0x3ff)<<10)
+            | (str.charCodeAt(i) & 0x3ff));
+          utf8.push(0xf0 | (charcode >>18),
+              0x80 | ((charcode>>12) & 0x3f),
+              0x80 | ((charcode>>6) & 0x3f),
+              0x80 | (charcode & 0x3f));
+        }
+      }
+      return utf8;
+    }
+    return toUTF8Array(s);
+  };
+
+}();
+
+(function (factory) {
+  if (typeof define === 'function' && define.amd) {
+      define([], factory);
+  } else if (typeof exports === 'object') {
+      module.exports = factory();
+  }
+}(function () {
+    return qrcode;
+}));
+</script>
 <script>
-const DATA = {"zh":{"meta":{"title":"你是一只什么动物","subtitle":"一场温柔的自我照见","note":"10 个问题 · 约 3 分钟 · 没有标准答案","intro":"这不是一个严谨的心理学测试，而是一面镜子。\n它借动物的活法，把你身上独特的地方，换一种方式说给你听。\n凭直觉作答就好——你最先想到的那个，往往最接近你。"},"ui":{"eyebrow":"动物原型 · 一面镜子","start":"开始","back":"← 上一题","qWord":"第","qLast":"最后一题","rPre":"你是一只","habitLabel":"它的奇特之处","secStrength":"你的优势","secShadow":"你的阴影","secNiche":"你的生态位","secReframe":"给你的一句话","again":"再测一次","share":"截图保存，或分享给那个你想更懂的人。","credit":"一面温柔的镜子 · 动物原型测试","toggle":"EN"},"axis":{"social":{"群":"共鸣","独":"独行"},"risk":{"探":"探路","守":"守望"},"tempo":{"冲":"冲刺","续":"长跑"},"tone":{"温柔":"温柔","奇趣":"奇趣","坚韧":"坚韧"}},"questions":[{"dim":"社交","q":"朋友带你去一个几乎没有熟人的轻松聚会，没人指望你做什么，你可以完全随自己。你会自然地——","options":[{"t":"找一两个聊得来的人深入聊，把这一晚过成一场真正的对话","p":"群"},{"t":"在人群里自在穿梭，和很多人都聊上几句，享受热闹","p":"群"},{"t":"找个舒服的位置待着，有人来聊就聊，没人来也不尴尬","p":"独"},{"t":"待到不失礼就准备撤，回到自己的节奏里才真的放松","p":"独"}]},{"dim":"社交","q":"今晚你没什么烦心事，就是单纯地累、想放空，一整晚都属于你自己。哪种安排最让你回血？","options":[{"t":"叫上朋友随便吃点、聊聊天，有人在身边就松了","p":"群"},{"t":"约一两个人一起做件轻松的事，不用多聊，有人同行就好","p":"群"},{"t":"一个人窝着——洗澡、发呆、刷点喜欢的东西，谁都别来找我","p":"独"},{"t":"一个人去做件喜欢的事，自己沉进去最舒服","p":"独"}]},{"dim":"社交","q":"在一个你长期所属的群体里，你更像——","options":[{"t":"把大家串起来的人——记得每个人的事、张罗聚会","p":"群"},{"t":"稳稳在场的一员——不一定张罗，但大家知道你一直都在","p":"群"},{"t":"时来时走的旅人——有联结，但你需要常常离开再回来","p":"独"},{"t":"自成一体的存在——珍惜这个群体，但重心始终在自己身上","p":"独"}]},{"dim":"风险","q":"一个有吸引力但充满未知的机会突然出现。你的第一反应通常是——","options":[{"t":"心先动了，想“先试了再说”，细节边走边补","p":"探"},{"t":"兴奋之余先做点功课，但心里其实已经倾向去了","p":"探"},{"t":"先按住兴奋，问自己“如果出岔子，我会损失什么”","p":"守"},{"t":"第一反应是守住现在拥有的，不轻易为一个未知动现有的盘","p":"守"}]},{"dim":"风险","q":"对一个你在意的人，有些心意你一直没说出口。你更可能——","options":[{"t":"找个时机直接说出来，把不确定摊开总比憋着好","p":"探"},{"t":"用行动或迂回的方式先试探，水温合适了再多走一步","p":"探"},{"t":"反复推演各种反应，确认安全了才敢开口","p":"守"},{"t":"宁可把它守在心里，也不想冒着关系受损的风险","p":"守"}]},{"dim":"风险","q":"你独自到了一个完全陌生的地方（没来过的城市、语言不通的环境）。你最先做的是——","options":[{"t":"直接出门乱逛，迷路也没关系，乱走才有惊喜","p":"探"},{"t":"直奔最有意思的地标、市场、巷子，跟着好奇心一路走","p":"探"},{"t":"先把周边摸清——出口、回程、哪里安全，心里有底才放松","p":"守"},{"t":"先安顿好一个让你安心的据点，再从那里慢慢往外探","p":"守"}]},{"dim":"节奏","q":"接下一件你真正在乎的事，从头到尾，你的投入通常是什么形状？","options":[{"t":"一上来就猛扎进去、高强度推进，然后需要彻底歇一阵再回来","p":"冲"},{"t":"状态来的时候疯狂输出，没状态就停，呈一波一波的","p":"冲"},{"t":"每天稳定推进一点，不快但几乎不断线","p":"续"},{"t":"配好自己的速度、留有余力，均匀地走到终点","p":"续"}]},{"dim":"节奏","q":"什么时候你最容易进入“全力以赴”的状态？","options":[{"t":"临近截止、压力顶上来时，肾上腺素一来就爆发","p":"冲"},{"t":"遇到特别带感的新东西，新鲜感一上头就停不下来","p":"冲"},{"t":"当它长成日常的一部分，靠习惯和节律自然推进","p":"续"},{"t":"看到长远的意义，靠这份笃定细水长流地走","p":"续"}]},{"dim":"节奏","q":"如果让你设计自己理想的生活节奏，更接近——","options":[{"t":"一阵全情投入的“旺季”，接着一段彻底放空的“淡季”，张弛分明","p":"冲"},{"t":"短周期切换——冲一段、换个事、再冲一段，保持新鲜","p":"冲"},{"t":"每天都差不多的稳定节律，靠日复一日的累积慢慢变好","p":"续"},{"t":"不疾不徐地长期深耕一两件事，享受慢慢来的过程","p":"续"}]},{"dim":"底色","q":"最后一个：如果要说你身上最特别、最“不一样”的那一点，更接近——","options":[{"t":"你有种让人安心的能量——在你身边，别人会不自觉地松下来","p":"温柔"},{"t":"你总有些出人意料的地方——越了解你，越觉得“原来人还能这样”","p":"奇趣"},{"t":"你身上有股安静的韧劲——再难的处境，你都能自己扛过去、还活出花来","p":"坚韧"}]}],"results":{"群探续":{"温柔":{"animal":"大雁","habit":"飞行时会轮流飞到最前面分担阻力，有同伴掉队，会有两只陪着它一起留下。","intro":"你是一只大雁——天生愿意带着大家一起远行的那种人。","strength":"你心里总装着“我们”。你敢于一次次朝远方启程，愿意为了一个值得奔赴的目标长途跋涉，也懂得在飞行中轮流到最前面分担阻力，让队伍走得更省力、更远。你的勇气是温暖的、带着同伴的。","shadow":"但你太容易把整个队伍的重量背在自己肩上。有谁掉了队，你会本能地慢下来陪着——哪怕代价是耗尽自己。你不太允许自己飞在中间、被别人托一把。","niche":"你在有共同方向、有人同行的地方最有光；在各自为政、没有目标的环境里会慢慢失去力气。你需要的，是一群愿意轮流领飞的伙伴。","reframe":"你不必永远飞在最前面。允许自己偶尔掉到队伍中间，让风替你挡一会儿——被托住，不是软弱，是你也值得的休息。"},"奇趣":{"animal":"座头鲸","habit":"会唱出复杂悠长的歌，还会在看到别的物种被虎鲸围猎时，挺身去保护跟自己毫无关系的它们。","intro":"你是一只座头鲸——一个会把善意唱成歌、还会唱给陌生人听的存在。","strength":"你有种超出“自己人”的善良。你会唱出复杂悠长的歌，也能横跨整片大洋、完成漫长的迁徙，还会在看到别的物种被虎鲸围猎时毫不犹豫地挺身介入——哪怕那和你毫无关系。你的关怀辽阔，你敢于出手的胆识，也一样辽阔。","shadow":"但你常常先想着别人、把自己的需要排到很后面。你为陌生人停下、为不相干的事出力，回过头却发现没人替你停一停。你的辽阔，有时也是一种把自己摊得太薄。","niche":"你在能施展善意、又懂得珍惜你的环境里最自在；在只讲利害、不讲情义的地方会觉得格格不入。你需要同样辽阔的人，才接得住你的辽阔。","reframe":"你可以为陌生人挺身，也请记得为自己挺身一次。把那首歌偶尔唱给自己听——你的善意，也该有一部分留给你自己。"},"坚韧":{"animal":"角马","habit":"年复一年穿越草原、强渡满是危险的大河，完成地表最壮观的迁徙之一，靠整群的勇气过关。","intro":"你是一只角马——在大队伍里一往无前、再险也跟着闯过去的人。","strength":"你有一种集体性的勇气。年复一年，你和同伴一起穿越草原、强渡险河，不是因为不怕，而是因为“大家一起”就敢。你耐得住长途，也扛得住关口。","shadow":"但你太习惯随着大队伍前进，有时来不及问自己“我想去哪”。你把方向交给了集体的洪流，个人的声音容易被淹没；停下来、掉队，会让你莫名不安。","niche":"你在有共同征途、彼此信任的群体里最强大；在一盘散沙、各自打算的环境里会失去方向感。你需要值得一起渡河的同伴。","reframe":"跟着大队伍很有力量，但偶尔，也值得问问那个被洪流盖住的声音：这条河，是你想渡的吗？你既能随群奔腾，也有权选自己的方向。"}},"群探冲":{"温柔":{"animal":"海獭","habit":"睡觉时会和同伴手拉手，免得在睡梦里漂散；还会随身带一块自己最爱的石头。","intro":"你是一只海獭——在关系里柔软、会照顾人、还守着自己小珍宝的那种人。","strength":"你给得出温度。睡觉时你会和同伴手拉手，免得在睡梦里漂散；你贪玩、好奇、来得快，能轻易把欢乐带给身边的人。你也懂得守护只属于自己的那点珍宝。","shadow":"但你的能量是一阵一阵的——尽兴之后需要漂回水面歇一歇。别人未必懂你这种“忽然安静”，容易误以为你变冷淡了。你也怕一松手，重要的人就漂走了。","niche":"你在能一起玩闹、又允许你回血的关系里最舒展；在要求你时刻热情、不能喊累的环境里会被掏空。你需要不把你的“暂停”当成疏远的人。","reframe":"你不必一直拉着所有人的手。允许自己先漂回水面、把自己照顾好——你松开的那只手，信任的人不会就此漂走。"},"奇趣":{"animal":"渡鸦","habit":"会纯粹为了好玩从雪坡上滑下来，还会给善待过它的人叼来小石子、小亮片当礼物。","intro":"你是一只渡鸦——聪明、贪玩、记恩，越相处越让人惊喜的存在。","strength":"你机灵得不像话。你会纯粹为了好玩从雪坡上滑下来，也会给善待过你的人叼来一件小礼物。你的脑子转得飞快，记得谁对你好，也总能给关系制造意外的惊喜。你的劲头是一阵一阵的：兴致说来就来，一头扎进去玩个痛快，尽兴了便抽身。","shadow":"但你的聪明有时也让你藏起真心。你用玩笑、机巧和小礼物去靠近人，却不太轻易把脆弱的那一面交出来。别人觉得你有趣，却未必觉得自己真正走进了你。","niche":"你在欣赏你的古灵精怪、又愿意陪你玩的人身边最闪光；在死板、不解风情的环境里会觉得无趣又拘束。你需要聪明到能接住你梗的人。","reframe":"你不必总用机巧和礼物来换亲近。偶尔放下那只叼着礼物的嘴，直接说一句真心话——你本身就足够有趣，不靠表演也值得被靠近。"},"坚韧":{"animal":"阿德利企鹅","habit":"在严寒的海里成群跃出水面、横冲直撞，常常是那个先跳下水、再回头招呼同伴的莽撞家伙。","intro":"你是一只阿德利企鹅——群体里那个一头扎进去、带着大家往前冲的人。","strength":"你胆子大得不像话。在严寒的海里，你会成群跃出水面、横冲直撞，半点不犹豫。你有股莽撞又可爱的冲劲，常常是那个先跳下去、再回头喊大家“水里没事，来吧”的人。","shadow":"但你冲在前面久了，也会忘了自己其实也会怕、也会累。你把犹豫藏起来，用行动盖过不安；等到撑不住时，旁人才惊讶“原来你也会倒下”。","niche":"你在需要有人带头、又彼此扶持的群体里最有价值；在人人观望、没人敢动的环境里会孤立无援。你需要既能跟你一起冲、也能在你累时接住你的同伴。","reframe":"带头跳下水很勇敢，但你也允许自己喊一声“我有点怕”。把不安说出来，不会削弱你的勇气——真正的硬核，是连脆弱也敢承认。"}},"群守续":{"温柔":{"animal":"大象","habit":"能用地面的震动在几公里外和同伴“对话”，还会在同伴逝去的地方久久停留、默哀。","intro":"你是一只大象——群体里最长情、连别人的悲伤都接得住的守护者。","strength":"你稳，而且深情。你能用地面的震动在几公里外和同伴“对话”，也会为逝去的伙伴久久默哀。你警觉地守护着整个族群，是那个让大家有安全感的存在。","shadow":"但你把所有人的安危都背在身上，自己的疲惫却很少说出口。你太擅长接住别人，以至于忘了自己也会撑不住；放下责任，对你来说几乎是种罪恶感。","niche":"你在稳定、需要被守护和照料的群体里最有光；在动荡、人人自顾的环境里会心力交瘁。你需要一个也会回头守护你的族群。","reframe":"守护者也需要被守护。你接住了那么多人的重量，也请允许有人来接住你——把疲惫说出口，不会让你不再可靠，只会让你不再独自硬撑。"},"奇趣":{"animal":"帝企鹅","habit":"在零下几十度里挤成一团取暖时，会不断轮换位置，让每一只都轮流站到最暖的中心、也轮流去外圈挡风。","intro":"你是一只帝企鹅——懂得让每个人都轮流被照顾到的那种人。","strength":"你的善良很有智慧。在零下几十度里，你们挤成一团取暖，却不断轮换位置，让每一只都轮流站到最暖的中心、也轮流去外圈挡风。你天生懂得公平地分担艰难，不让谁一直受冻。而在最冷的时候，你也是那个把那枚蛋稳稳护在脚背上、不吃不喝熬过整个寒冬的守望者。","shadow":"但你太执着于“让每个人都被照顾到”，常常把自己排在最后那一班岗。你默默多站了几轮外圈，却觉得理所当然；久而久之，没人意识到你其实也冷。","niche":"你在懂得轮流、彼此扛事的群体里最温暖；在只索取、不轮班的环境里会被冻透。你需要同样愿意替你挡风的人。","reframe":"你为大家轮值了那么多回，也该轮到你站进最暖的中心了。让别人替你挡一次风——你照顾了所有人，自己也在“所有人”里面。"},"坚韧":{"animal":"麝牛","habit":"遇到危险时，成年个体会围成一圈、把幼崽护在中间，一律面朝外、用身体硬扛冰河时代般的严寒与猛兽。","intro":"你是一只麝牛——护人的方式是把弱者圈进来、自己面朝危险的人。","strength":"你有一种沉默的、硬核的守护力。遇到危险时，你们会围成一圈、把幼崽护在中间，成年个体一律面朝外站着扛。你能硬扛冰河时代般的严寒，也能为身后的人挡住最冷的风。","shadow":"但你总把自己放在最外圈、面朝风暴，很少让别人看到你也会被冻伤。你用“我来扛”挡住了所有担心，却也挡住了别人靠近、心疼你的机会。","niche":"你在需要被保护、值得你守的群体里最强大；在没人值得守、或没人懂你守护的环境里会觉得孤独又疲惫。你需要圈内的人偶尔回头看你一眼。","reframe":"你面朝风暴站了很久。偶尔转过身来，让圈里的人也为你挡一次风——被保护，不会让你不再是那头扛事的麝牛，只会让你扛得久一点。"}},"群守冲":{"温柔":{"animal":"梅花鹿","habit":"成群而居、极度警觉，一丝风吹草动都逃不过它，察觉不对便能轻盈地一跃而起。","intro":"你是一只梅花鹿——心思细、感知快，总能第一个察觉氛围变化的人。","strength":"你敏感得优雅。成群生活的你极度警觉，一丝风吹草动都逃不过你，察觉到不对便能轻盈地一跃而起。你对人和气氛有种天生的细腻，常常是最先读懂房间里情绪的那一个。","shadow":"但你的敏感也让你容易紧绷。别人没察觉的细微变化会牵动你一整天，你替大家提前担心，神经却很难真正松下来。有时危险还没来，你已经先累了。","niche":"你在温和、可预期、彼此体贴的群体里最自在；在动荡、充满冲突的环境里会被持续的警觉掏空。你需要能让你放下戒备、安心吃草的草原。","reframe":"你的敏锐是天赋，但不是每一次风吹草动都意味着危险。试着教自己的神经分辨真假警报——你可以一边保有这份细腻，一边允许自己偶尔什么都不担心地待一会儿。"},"奇趣":{"animal":"草原犬鼠","habit":"叫声复杂到能描述天敌的种类、大小甚至颜色，见面还会用“亲吻”来打招呼。","intro":"你是一只草原犬鼠——群体里把危险讲清楚、也用亲昵维系大家的“播报员”。","strength":"你是个了不起的沟通者。你的叫声复杂到能描述天敌的种类、大小甚至颜色，见面还会用“亲吻”来打招呼。你既能精准地把信息传出去，又懂得用亲密把大家连在一起。而真有危险时，你反应极快——一声警报、瞬间窜回洞里，半点不拖。","shadow":"但你太忙着替大家盯着危险、传递消息，常常没空照顾自己的情绪。你把警报喊给所有人听，自己心里的不安却很少有人听见；你维系着整个社群，却容易在其中感到孤单。","niche":"你在重视沟通、彼此照应的群体里最有价值；在信息混乱、各说各话的环境里会焦虑又疲惫。你需要一个也愿意听你说说话的同伴。","reframe":"你替大家播报了那么多危险，也值得有人问一句“那你呢？”。把警报偶尔调成悄悄话，说说自己的不安——你不只是那个报信的，你也是值得被关心的那一个。"},"坚韧":{"animal":"狐獴","habit":"会轮流站岗放哨、为整群警戒，还会手把手地教幼崽怎么对付有毒的蝎子。","intro":"你是一只狐獴——守望着集体、把“如何活下去”一点点传下去的人。","strength":"你是天生的守护者兼老师。你们轮流站岗放哨，时刻为群体警戒；你还会手把手地教幼崽怎么对付有毒的蝎子。你既警觉又有担当，把生存的本事踏实地传给身边的人。而哨声一响，你又能瞬间从静立切换成行动，群起而上、快而果断。","shadow":"但你站岗站得太久，几乎忘了自己也有下哨的时候。你把“我得盯着”变成了本能，难以真正放松；你忙着教别人怎么活，自己却很少被照顾、被教导。","niche":"你在需要警戒和传承的群体里不可替代；在长期高压、危机四伏的环境里会被耗尽。你需要可以轮班的同伴，让你也能安心睡一觉。","reframe":"你不必一个人站完所有的岗。把哨位交给信得过的伙伴，去补个觉——会放手的守望者，才守得长久。你也值得偶尔被守护着、什么都不用盯。"}},"独探续":{"温柔":{"animal":"海龟","habit":"独自靠地磁场穿越几千公里的海洋，几十年后还能精准回到自己出生的那片沙滩。","intro":"你是一只海龟——一个人也能走很远、心里却始终有个回得去的原点的人。","strength":"你独立又有韧性。你能独自靠着地磁场穿越几千公里的海洋，几十年后，还能精准地回到自己出生的那片沙滩。你不需要陪伴也能坚持，内心有一个谁都拿不走的方向感。","shadow":"但你太习惯一个人扛、一个人走，远到别人很难追上你、也很难真正靠近。你把“我能自己来”当成默认，渐渐地，连求助和并肩都变得陌生；漂泊久了，会与人慢慢失了联系。","niche":"你在拥有自由和广阔天地、又有一个能回去的原点的环境里最安定；在要求你时刻在场、寸步不离的关系里会窒息。你需要懂得“我走得远，但我会回来”的人。","reframe":"一个人走得远，不代表所有的浪都要自己扛。你心里那个回得去的原点，也可以是某个人——让某些人成为你的沙滩，不会拖住你远行，只会让你回来时有灯。"},"奇趣":{"animal":"信天翁","habit":"能连续在海上滑翔好几年、几乎不落地，把整片大洋当成家；而一生只认一个伴侣，专一得近乎执拗。","intro":"你是一只信天翁——看似常年漂泊、独来独往，深处却有一份极其专一的牵系。","strength":"你天生属于远方。你能连续在海上滑翔好几年、几乎不落地，敢独自把整片陌生的大洋当成疆域去闯。你独立、耐久、不惧孤身远行——而在这份漂泊之下，你一生只认一个伴侣，专一得近乎执拗。","shadow":"但你飞得太久太远，落地反而让你不安。你享受独行的辽阔，却也容易把“靠岸”无限推迟；那个你深深认定的人，可能在等一个总是在天上的你。","niche":"你在能自由翱翔、又有一处真正想回的岸的状态里最完整；在被困住、不能飞的环境里会枯萎。你需要一个不怕你飞远、也相信你会归来的人。","reframe":"你可以一直飞，但别忘了落地也是一种能力。偶尔收起翅膀、踏踏实实地待在那个人身边——靠岸不是束缚，是让你的远方有了意义的原因。"},"坚韧":{"animal":"北极燕鸥","habit":"每年在地球的南北两极之间往返，追着那永不落幕的夏天，是这颗星球上迁徙最远的生物。","intro":"你是一只北极燕鸥——一生都在追光、不肯停，把别人眼里的“折腾”活成了远方的人。","strength":"你有近乎传奇的耐力。你每年独自往返于地球的南北两极之间，追着那永不落幕的夏天，是这颗星球上迁徙最远的生物。别人眼里的折腾，在你这里是一种不肯将就的执着——而这条地表最长的迁徙，你大多是一个人走完的。","shadow":"但你停不下来。你把“在路上”当成了存在的方式，一旦静止就莫名空落落的；你追了一生的光，却很少问自己，是不是也需要一处可以停下来、什么都不追的地方。","niche":"你在不断有新的远方、可以一直追光的状态里最有生命力；在停滞、重复、看不到下一段旅程的环境里会失去意义感。你需要懂你这份“追光”、不劝你安定的人。","reframe":"你追了那么久的光，也允许自己偶尔停在原地，让光来找你一次。停下来不等于放弃远方——有时候，是为了确认自己到底在追什么。"}},"独探冲":{"温柔":{"animal":"耳廓狐","habit":"耳朵比脸还大，能听见猎物在地下走动；几乎不靠喝水，全凭食物里的水分就能在沙漠活下去。","intro":"你是一只耳廓狐——一个人灵巧地忙碌着、能在贫瘠里把日子过出滋味的人。","strength":"你感官敏锐、机灵又自足。你那对比脸还大的耳朵，能听见猎物在地下走动；你几乎不靠喝水也能活，总有办法在最贫瘠的地方为自己找到滋味。你一个人，也能把生活打理得有声有色。你动作敏捷、来得快——猛地刨土、轻巧弹跳，一阵风似的忙活，尽兴后又能立刻安静下来。","shadow":"但你太会“自己消化”了。你机敏地察觉一切、独自把日子安排妥当，却很少向别人发出“我需要”的信号。你在贫瘠里活得太好，反而让人以为你什么都不缺、不用被照顾。","niche":"你在有自己的空间、又有新鲜事可探的环境里最快活；在嘈杂、过度黏腻、不给你独处的关系里会烦躁。你需要既尊重你的独立、又看得见你也有需要的人。","reframe":"你能在贫瘠里活得很好，但你不必总是“什么都不缺”。竖起耳朵听别人之余，也让别人听见你的需要——被照顾，不会让你显得脆弱，只会让贫瘠的日子多一点甜。"},"奇趣":{"animal":"章鱼","habit":"有三颗心脏、分布在全身的“九个脑”，能瞬间变色、用椰子壳当工具，遇险时喷一团墨溜走。","intro":"你是一只章鱼——一个自成一类的独行探险家，用整副身体在思考、三颗心脏全为好奇而跳。","strength":"你天生是个解题者。一道没见过的难题、一扇关着的门，对你都像邀请——你会伸出手，边试边学，直到找到一条别人没想到的缝隙钻过去。环境一变，你瞬间换上新的颜色与质地；独自一人，照样能把世界探个底朝天。你的聪明，是“换个方向总有办法”的那种。","shadow":"但你也太擅长消失了。当事情逼近、当有人快要看清你，你的本能是喷出一团墨、换上保护色，悄悄退回自己的洞穴。你习惯独自解决一切——宁可一个人想办法逃出鱼缸，也不愿发出“我卡住了”的信号。而你那来去如潮的节奏，身边的人未必跟得上。","niche":"你在有一个完全属于你的洞穴、有探索的自由、有源源不断新鲜难题的地方如鱼得水；在要求时刻可见、整齐划一、一成不变的环境里枯萎。最适合你的人，是那种不把你的消失当成拒绝、又好奇到愿意陪你一起折腾的人。","reframe":"变色、喷墨、溜走——这些本能曾一次次救过你，它们没有错。但你不必每次被看见都先消失；有些洞穴足够安全，安全到你可以不换颜色地待在里面，被一两个信得过的人看见原本的样子。还有——你那“太多、太怪、太多方向”从来不是要被修剪的毛病，那是九个大脑。"},"坚韧":{"animal":"蜂鸟","habit":"夜里能把心跳和体温降到近乎假死来熬过寒冷，白天又满血爆发、振翅如电，甚至能倒着飞。","intro":"你是一只蜂鸟——能在彻底耗尽后归零回血、再以惊人强度重新点燃自己的人。","strength":"你小，却强得惊人，而且总是独来独往。夜里，你能把心跳和体温降到近乎假死，来熬过寒冷；白天，你又满血爆发、振翅如电，甚至能倒着飞——只为追上一朵刚开的新花。你对世界有股不知疲倦的好奇，懂得彻底地休息，也懂得彻底地燃烧，张弛之间藏着别人没有的强度。","shadow":"但你那种“要么全开、要么近乎停摆”的节奏，外人很难理解。你燃烧时太亮，停摆时又像消失，别人容易在你“假死”的时候慌张，或在你爆发时跟不上。你也容易把自己逼到燃料见底才肯停。","niche":"你在能允许你大起大落、不必匀速前进的环境里最有生命力；在要求你恒定输出、不能“消失充电”的环境里会被榨干。你需要懂得你的节奏、不在你回血时打扰你的人。","reframe":"你那近乎假死的休息，不是软弱，是你能再次满血的原因。别等燃料见底才允许自己停——主动归零回血，不会让你失去那身惊人的强度，只会让它烧得更久。"}},"独守续":{"温柔":{"animal":"树懒","habit":"慢到背上都长出了青苔，靠极低的消耗把日子过得很长，从不为不值得的事浪费一丝力气。","intro":"你是一只树懒——慢，但那是一种把能量省给真正重要之事的智慧。","strength":"你独自挂在高高的树冠上，有一种被低估的从容。你慢到背上都长出了青苔，靠着极低的消耗，把日子过得很长、很稳。你慢到几乎不动，慢本身反倒成了最好的保护色——危险常常认不出你。你不争不抢，却自有一套把力气用在刀刃上的智慧——别人在内耗的事，你早已学会放过。","shadow":"但你的慢，常被外界误读成消极或拖延。你也容易把“慢慢来”变成“一直不来”，让真正想做的事停在原地；你太擅长保存能量，有时连该出手、该靠近的时刻也错过了。","niche":"你在不被催促、可以按自己节奏生活的环境里最安宁；在追求效率、人人赶路的环境里会被推着走、被误解。你需要懂得“慢也是一种节奏”的人。","reframe":"你的慢是智慧，但别让它变成永远的停留。把省下来的能量，偶尔大方地花在一件真正重要的事上——慢慢来不等于不来，你值得为某些事，稍微快一点点。"},"奇趣":{"animal":"穿山甲","habit":"是唯一一种披着鳞甲的哺乳动物，一受惊就卷成一颗严丝合缝的球——不靠攻击，靠把自己守得密不透风。","intro":"你是一只穿山甲——温和又自带盔甲，不伤人，却谁也撬不开你的核心。","strength":"你温柔，却不好欺负。作为唯一一种披着鳞甲的哺乳动物，你一受惊就卷成一颗严丝合缝的球——不靠攻击，靠的是把自己守得密不透风。你安静、内敛，有一层别人看不透的保护壳。你也耐得住——能安安静静、不慌不忙地把一件慢事做上很久。","shadow":"但你卷起来的时候，连善意也被挡在了外面。你用盔甲护住了核心，也让真正想靠近的人无从下手；你太习惯独自防御，久了，连自己都快忘了壳里那个柔软的你长什么样。","niche":"你在安全、不被打扰、能慢慢建立信任的环境里最舒展；在充满侵入感、要求你时刻敞开的环境里会本能地卷紧。你需要有耐心、愿意等你慢慢打开的人。","reframe":"你的盔甲是用来保护核心的，不是用来永远不被靠近的。对那一两个等了你很久的人，试着慢慢松开一点——卷起来很安全，但偶尔舒展开，你才会知道，原来有些手是来抚摸、不是来伤害的。"},"坚韧":{"animal":"落基山岩羊","habit":"进化出特殊的蹄子，能独自稳稳踩在近乎垂直的峭壁上择路，把最极端的高山活成了自己的家。","intro":"你是一只落基山岩羊——无论被丢到多难的处境，都能找到立足点、活出花来的人。","strength":"你是天生的韧性进化者。别人躲开的悬崖峭壁，你却进化出特殊的蹄子，独自稳稳踩在近乎垂直的岩壁上择路而行。你不去争抢平原，而是把最极端的环境活成了自己的家——抗压、能调适，落到哪里都能扎根。","shadow":"但你太能扛了，扛到忘了“难”也是可以被分担的。你独自攀在峭壁上，从不喊累、不喊险，让别人以为你不需要帮助；久而久之，你把所有的难都默认成“我自己的事”。","niche":"你在有挑战、能让你施展适应力的环境里最有光；在过于安逸、没有坡可爬的地方反而会觉得无趣。但你也需要一处可以下山、不必时刻紧绷的歇脚地。","reframe":"你能在峭壁上活出花来，这是你的天赋，但不是你必须独自受苦的理由。偶尔从崖壁上下来、让别人搭把手——接受帮助，不会削弱你的韧性，只会让你在下一段险路上，走得不那么孤单。"}},"独守冲":{"温柔":{"animal":"刺猬","habit":"受到威胁时会卷成一颗刺球护住自己——刺是向内防御的，从不主动去攻击谁。","intro":"你是一只刺猬——你的力量是把自己守好，而不是去刺伤别人。","strength":"你温柔，且懂得自我保护。受到威胁时，你会卷成一颗刺球护住自己——从不主动去攻击谁。你的刺是向内防御的，不是向外伤人的；你独来独往、不爱声张，安静的外表下其实有一颗格外柔软的心。","shadow":"但你卷起来太快了，有时还没分清对方是敌是友，就先竖起了刺。你用防御挡住了伤害，也挡住了拥抱；那些想靠近的人，常被你下意识的刺退了一步。","niche":"你在温和、安全、不会突然伤害你的环境里最放松；在充满冲突和侵犯的环境里会一直紧绷着刺。你需要有耐心、不会因为被扎一下就走开的人。","reframe":"你的刺是为了保护那颗柔软的心，不是为了拒绝所有的靠近。试着在竖刺之前，多给半秒去分辨：这是威胁，还是一只伸过来想牵你的手？有些人，值得你慢慢把刺收起来。"},"奇趣":{"animal":"鸭嘴兽","habit":"能闭着眼、耳、鼻，仅凭感知水里微弱的电场就精准捕猎；还是个会下蛋的哺乳动物，一身打破分类的特征。","intro":"你是一只鸭嘴兽——靠别人没有的“第六感”读这个世界、怎么都装不进现成格子的人。","strength":"你独特到自成一类。你能闭着眼、耳、鼻，仅凭感知水里微弱的电场就精准捕猎，还是会下蛋的哺乳动物——一身打破分类的特征。你天性谨慎、不轻易现身：总在水面之下悄悄观察，先用那套别人没有的直觉把周遭摸清、确认安全了才出手；而一旦锁定，你又能一个猛子扎下去，快得让人措手不及。","shadow":"但“装不进任何格子”也意味着孤独。你的感知方式和别人不一样，常常难以被理解、被归类；你太依赖自己那套独特的直觉，反而不太相信、也不太寻求别人的视角。","niche":"你在允许你“不一样”、欣赏你独特直觉的环境里最自在；在要求你合群、按标准答案来的环境里会浑身不对劲。你需要不急着给你贴标签、愿意理解你独特频率的人。","reframe":"你装不进任何格子，这从来不是缺陷，而是你最珍贵的地方。但别因为“没人懂”就只信自己的直觉——偶尔把你感知到的说出来，让一两个人试着进入你的频率。自成一类的你，也值得被理解，而不只是被惊叹。"},"坚韧":{"animal":"兔狲","habit":"拥有猫科里最浓密的毛发来扛严寒；耳朵又低又圆，好让它贴着地、藏在石头后悄悄探出头观察，而不被发现。","intro":"你是一只兔狲——独自守在领地里、不动声色地观察，关键时刻却又快又准的人。","strength":"你独来独往，在自己的地盘里自给自足。你天生警觉，习惯贴着地、藏在掩体后静静观察，不动声色地把周遭看个清楚——出手时却又快又准，一个扑击干脆利落。再冷再难的地方，你都能靠自己那身“厚底子”稳稳扛过去。","shadow":"但你藏得太好了。你习惯把自己缩在石头后面、不轻易现身，连情绪都板着一张脸不让人看出来；你独自扛过严寒，却很少让人知道你也会冷。久了，想靠近你的人，连你探出头的那一刻都很难等到。","niche":"你在能让你独处、又有自己地盘可守的环境里最安定；在喧闹、需要你时刻露面、热情外向的环境里会浑身别扭。你需要有耐心、不催你现身、愿意慢慢等你探出头的人。","reframe":"你那身扛过严寒的厚毛、那张不动声色的脸，都曾好好地保护过你。但偶尔，你可以从石头后面多探出一点点头——让一两个等了很久的人看见你。被看见，不会让你失去那份独自过冬的本事，只会让冬天没那么冷。"}}}},"en":{"meta":{"title":"What Animal Are You?","subtitle":"A gentle way of seeing yourself","note":"10 questions · about 3 minutes · no right answers","intro":"This isn't a rigorous psychology test — it's a mirror.\nIt borrows the way animals live to tell you, in another voice, what's unusual about you.\nJust answer on instinct. The first thing that comes to mind is usually the truest."},"ui":{"eyebrow":"Animal archetype · a mirror","start":"Begin","back":"← Back","qWord":"Question ","qLast":"Last question","rPre":"You are","habitLabel":"What makes it remarkable","secStrength":"Your strengths","secShadow":"Your shadow","secNiche":"Where you thrive","secReframe":"A few words for you","again":"Take it again","share":"Screenshot it, or send it to someone you'd like to understand a little better.","credit":"A gentle mirror · an animal archetype quiz","toggle":"中"},"axis":{"social":{"群":"Social","独":"Solitary"},"risk":{"探":"Explorer","守":"Watcher"},"tempo":{"冲":"Sprinter","续":"Endurer"},"tone":{"温柔":"Tender","奇趣":"Singular","坚韧":"Resilient"}},"questions":[{"q":"A friend brings you to a relaxed gathering where you barely know anyone, and nothing is expected of you. You'd naturally—","options":[{"t":"Find one or two people you click with and sink into a real conversation"},{"t":"Drift easily through the room, trade a few words with lots of people, enjoy the buzz"},{"t":"Settle into a comfortable spot — chat if someone comes by, perfectly fine if no one does"},{"t":"Stay just long enough to be polite, then slip back to your own rhythm to really relax"}]},{"q":"Tonight nothing's bothering you — you're just tired and want to switch off, and the whole evening is yours. What restores you most?","options":[{"t":"Grab a bite and chat with friends — having people around loosens you up"},{"t":"Do something light with a person or two — no need to talk much, company is enough"},{"t":"Curl up alone — a shower, some daydreaming, scrolling something you love, nobody bothering you"},{"t":"Lose yourself in something of your own — the kind of thing you can sink right into"}]},{"q":"In a group you've belonged to for a while, you're more like—","options":[{"t":"The one who holds everyone together — remembers each person, plans the get-togethers"},{"t":"A steady presence — not always the organizer, but everyone knows you're always there"},{"t":"A wanderer who comes and goes — connected, but you need to keep leaving and returning"},{"t":"A world of your own — you treasure the group, but your center always stays with you"}]},{"q":"An appealing but uncertain opportunity suddenly appears. Your first instinct is usually—","options":[{"t":"Your heart's already in — 'let's just try it,' and figure out the details on the way"},{"t":"Excited, but you do a little homework first — though honestly you're already leaning yes"},{"t":"Hold the excitement back and ask, 'if this goes wrong, what do I stand to lose?'"},{"t":"Your first move is to protect what you already have, not gamble it on an unknown"}]},{"q":"There's something you've never said to someone you care about. You're more likely to—","options":[{"t":"Find the moment and just say it — better out in the open than bottled up"},{"t":"Test the waters through actions or hints first, then take another step if it feels right"},{"t":"Run through every possible reaction in your head, and only speak once it feels safe"},{"t":"Rather keep it to yourself than risk damaging the relationship"}]},{"q":"You've arrived alone somewhere completely unfamiliar — a new city, a place where you don't speak the language. The first thing you do is—","options":[{"t":"Head straight out and wander — getting lost is fine, that's where the surprises are"},{"t":"Make a beeline for the most interesting landmark, market, or alley, following your curiosity"},{"t":"Get your bearings first — exits, the way back, where's safe — you relax once you know"},{"t":"Set up a base that feels secure, then explore outward from there, little by little"}]},{"q":"When you take on something you truly care about, what shape does your effort usually take?","options":[{"t":"Dive in hard from the start, push at full intensity, then need a real break before coming back"},{"t":"Pour it out when the mood strikes, stop when it doesn't — it comes in waves"},{"t":"Move it forward a little every day — not fast, but almost never breaking the thread"},{"t":"Set your own pace, keep some in reserve, and arrive evenly at the finish"}]},{"q":"When are you most likely to hit full throttle?","options":[{"t":"When a deadline looms and the pressure's on — the adrenaline kicks in and you burst"},{"t":"When something new and exciting shows up — the novelty grabs you and you can't stop"},{"t":"Once it's become part of your routine — habit and rhythm carry it along"},{"t":"When you can see the long-term meaning — that conviction keeps you going, slow and steady"}]},{"q":"If you could design your ideal rhythm of life, it'd be closer to—","options":[{"t":"A 'high season' of total immersion, then a 'low season' of switching off completely — clear swings"},{"t":"Short cycles — sprint at one thing, switch, sprint again, keep it fresh"},{"t":"A steady daily rhythm, getting better through patient, day-by-day accumulation"},{"t":"Tending one or two things for the long haul, savoring the slow unfolding"}]},{"q":"Last one: the most singular, most 'unlike-anyone-else' thing about you is closer to—","options":[{"t":"You have a calming presence — people relax without realizing it when they're near you"},{"t":"You're full of the unexpected — the better people know you, the more they think, 'I didn't know a person could be like this'"},{"t":"There's a quiet toughness in you — drop you anywhere, and you'll find a way to get through, and even bloom"}]}],"results":{"群探续":{"温柔":{"animal":"Wild Goose","habit":"When they fly, they take turns at the front to break the wind for the others; and if one falls behind, two will stay back to keep it company.","intro":"You're a Wild Goose — the kind who naturally brings everyone along for the long journey.","strength":"You always carry a sense of 'us.' You're willing to set off toward the far horizon again and again, to travel a long way for a destination worth reaching — and you know to take your turn at the front, breaking the wind so the whole formation flies farther with less effort. Your courage is a warm one, the kind that brings others with it.","shadow":"But you carry the weight of the whole flock too easily on your own shoulders. When someone falls behind, your instinct is to slow down and stay with them — even at the cost of running yourself empty. You rarely let yourself drift to the middle and be carried for a while.","niche":"You shine where there's a shared direction and people to travel with; where everyone goes their own way with no goal, you slowly lose your strength. What you need is a flock willing to take turns leading.","reframe":"You don't have to fly at the front forever. Let yourself drop into the middle sometimes and let the wind carry you — being held isn't weakness, it's the rest you're owed too."},"奇趣":{"animal":"Humpback Whale","habit":"It sings long, complex songs — and when it sees another species being hunted down by orcas, it will step in to protect creatures that have nothing to do with it at all.","intro":"You're a Humpback Whale — the kind who turns kindness into song, and sings it even for strangers.","strength":"You have a kindness that reaches beyond 'your own people.' You sing long, intricate songs, you can cross whole oceans on the longest of journeys, and when you see another creature being bullied, you step in without hesitation — even when it has nothing to do with you. Your care is vast, and so is the nerve it takes to act on it.","shadow":"But you so often think of others first and put your own needs far down the line. You stop for strangers, you spend yourself on things that aren't yours — and then you look up and find no one stopping for you. Your vastness can also be a way of spreading yourself too thin.","niche":"You're most at ease where your kindness has room to move and is cherished in return; in a place that runs purely on self-interest, you feel out of place. You need people as vast as you, to hold all that vastness back.","reframe":"You can step in for strangers — just remember to step in for yourself once, too. Sing that song to yourself now and then. Some of that kindness was always meant to stay with you."},"坚韧":{"animal":"Wildebeest","habit":"Year after year it crosses the savanna and fords danger-filled rivers to complete one of the greatest migrations on Earth, carried through by the courage of the whole herd.","intro":"You're a Wildebeest — the kind who presses forward with the herd and crosses any danger, as long as you're together.","strength":"You have a courage that belongs to the group. Year after year, you and the herd cross the plains and ford treacherous rivers — not because you're unafraid, but because 'together' makes you brave. You can endure the long road, and you can hold steady at the crossings.","shadow":"But you're so used to moving with the herd that you sometimes forget to ask yourself, 'where do I want to go?' You've handed your direction to the current of the group, and your own voice is easily drowned out; stopping or falling behind makes you strangely uneasy.","niche":"You're strongest in a group with a shared journey and real trust; in a scattered crowd of separate agendas, you lose your sense of direction. You need companions worth crossing a river with.","reframe":"Moving with the herd is powerful — but now and then, it's worth asking the voice the current covered over: is this the river you wanted to cross? You can run with the herd, and you can still choose your own way."}},"群探冲":{"温柔":{"animal":"Sea Otter","habit":"While they sleep, sea otters hold hands so they don't drift apart in the night — and each one keeps a favorite rock of its own.","intro":"You're a Sea Otter — soft in your bonds, quick to care for others, and quietly guarding a small treasure of your own.","strength":"You give off warmth. You'll hold a friend's hand so neither of you drifts apart in your sleep; you're playful, curious, quick to spark, and you bring joy to the people around you with ease. And you know how to guard the small treasure that's yours alone.","shadow":"But your energy comes in waves — after you've had your fill, you need to float back to the surface and rest. Others don't always understand that sudden quiet, and may mistake it for you growing cold. You're also afraid that if you let go of a hand, someone you love will drift away.","niche":"You're at your most open in bonds that let you play together and then come back to recharge; in a setting that demands you stay warm and never tired, you get drained. You need people who don't read your 'pause' as distance.","reframe":"You don't have to hold everyone's hand all the time. Let yourself float back up and take care of yourself first — the people you trust won't drift away just because you loosened your grip."},"奇趣":{"animal":"Raven","habit":"It will slide down a snowy slope purely for fun, and bring little gifts — pebbles, shiny trinkets — to the people who've been kind to it.","intro":"You're a Raven — clever, playful, and quick to remember kindness; the more time someone spends with you, the more you surprise them.","strength":"You're ridiculously clever. You'll slide down a snowy slope just for the fun of it, and you'll bring a little gift to someone who's treated you well. Your mind moves fast, you remember who was good to you, and you always find a way to surprise the people you're close to. Your drive comes in bursts: the mood strikes, you throw yourself in and play your fill, and once you've had enough, you step back.","shadow":"But your cleverness can also hide your true feelings. You use jokes, wit, and little gifts to get close to people, yet you don't easily hand over the fragile part of you. People find you fun — but they don't always feel they've truly gotten in.","niche":"You glow around people who appreciate your mischief and are willing to play along; in a stiff, humorless place, you feel bored and boxed in. You need someone clever enough to catch what you throw.","reframe":"You don't have to trade wit and gifts for closeness every time. Now and then, set down the gift in your beak and just say something true — you're interesting enough on your own; you're worth getting close to without the performance."},"坚韧":{"animal":"Adélie Penguin","habit":"In freezing seas they leap from the water in crowds and charge ahead — often the one who jumps in first and then turns back to call the others along.","intro":"You're an Adélie Penguin — the one in the group who dives in headfirst and pulls everyone forward.","strength":"You're brave to a ridiculous degree. In the freezing sea, you leap out of the water in a crowd and charge ahead without a flicker of hesitation. You've got a reckless, lovable drive — often the one who jumps in first, then turns back to shout, 'the water's fine, come on!'","shadow":"But after leading the charge for so long, you forget that you, too, can be scared and tired. You hide the hesitation and paper over the unease with action; only when you can't hold on any longer do others realize, with surprise, that you can fall down too.","niche":"You're most valuable in a group that needs someone to lead and still holds each other up; in a crowd where everyone hangs back and no one dares move, you end up alone. You need companions who'll charge in with you — and catch you when you're spent.","reframe":"Leading the dive is brave — but you're allowed to call out, 'I'm a little scared,' too. Naming the unease won't weaken your courage. The truly tough thing is daring to admit you're fragile."}},"群守续":{"温柔":{"animal":"Elephant","habit":"It can 'talk' with companions miles away through vibrations in the ground, and will linger in long mourning where one of its own has died.","intro":"You're an Elephant — the most devoted guardian in the herd, able to hold even other people's grief.","strength":"You're steady, and deeply loving. You can 'speak' to companions miles away through vibrations in the earth, and you'll mourn a lost member for a long, long time. You watch over the whole herd, vigilant — the presence that makes everyone feel safe.","shadow":"But you carry everyone's safety on your back, and your own exhaustion you rarely speak aloud. You're so good at holding others that you forget you can buckle too; for you, setting down responsibility feels almost like a sin.","niche":"You shine in a stable herd that needs to be guarded and cared for; in turmoil where everyone fends for themselves, you wear thin. You need a herd that will turn back and watch over you, too.","reframe":"Guardians need guarding too. You've held the weight of so many — now let someone hold you. Speaking your tiredness aloud won't make you any less reliable; it just means you no longer carry it all alone."},"奇趣":{"animal":"Emperor Penguin","habit":"Huddling together in temperatures dozens of degrees below zero, they constantly rotate positions so every bird takes a turn in the warm center and a turn out on the cold edge.","intro":"You're an Emperor Penguin — the kind who makes sure everyone takes a turn being cared for.","strength":"Your kindness is wise. In temperatures dozens of degrees below zero, you huddle for warmth — but you keep rotating, so every one of you takes a turn at the warm center and a turn facing the wind on the edge. You instinctively share the hardship fairly, never letting anyone stay cold for long. And when it's coldest, you're also the one who balances that single egg steadily on your feet, going without food or drink to make it through the whole winter — a watcher to the end.","shadow":"But you're so set on 'everyone getting cared for' that you keep putting yourself in the last shift. You quietly stand a few extra rounds on the cold edge and think nothing of it; over time, no one realizes that you get cold too.","niche":"You're warmest in a group that knows how to take turns and shoulder things together; in a place that only takes and never rotates, you freeze through. You need people just as willing to face the wind for you.","reframe":"You've taken so many turns for everyone — it's your turn to stand in the warm center now. Let someone block the wind for you. You looked after everyone; you're part of 'everyone' too."},"坚韧":{"animal":"Musk Ox","habit":"When danger comes, the adults form a ring with the young tucked safely in the middle, all facing outward to take the brunt of an Ice-Age cold and its predators.","intro":"You're a Musk Ox — the kind who protects by pulling the vulnerable inside and facing the danger yourself.","strength":"You have a silent, hardcore kind of protectiveness. When danger comes, you form a ring with the young tucked in the center, every adult facing outward to take the hit. You can withstand an Ice-Age cold, and you can block the harshest wind for those behind you.","shadow":"But you always place yourself on the outermost edge, facing the storm, and rarely let anyone see that you get frostbitten too. With 'I'll carry it,' you block all their worry — and you also block their chance to come close and ache for you.","niche":"You're strongest in a group worth protecting, one that's worth guarding; where no one's worth the guard, or no one understands your guarding, you feel lonely and worn out. You need the ones inside the ring to glance back at you now and then.","reframe":"You've stood facing the storm for a long time. Turn around once in a while, and let the ones inside the ring block the wind for you — being protected won't stop you from being the ox who carries things, it'll just let you carry them a little longer."}},"群守冲":{"温柔":{"animal":"Sika Deer","habit":"Living in herds and intensely alert, it catches the faintest stir in the grass and bounds away in one graceful leap the moment something feels off.","intro":"You're a Sika Deer — fine-tuned and quick to sense, always the first to feel a shift in the mood.","strength":"You're sensitive, gracefully so. Living in a herd, you're intensely alert — not a rustle escapes you, and the instant something feels wrong, you can spring up lightly and away. You have a natural delicacy with people and atmospheres, often the first to read the feeling in a room.","shadow":"But that sensitivity also leaves you taut. A subtle shift others miss can tug at you all day; you worry ahead of time on everyone's behalf, and your nerves struggle to truly settle. Sometimes the danger hasn't even arrived, and you're already tired.","niche":"You're most at ease in a gentle, predictable, considerate group; in turmoil and conflict, constant vigilance drains you. You need a meadow where you can lower your guard and graze in peace.","reframe":"Your sharpness is a gift, but not every rustle means danger. Try teaching your nerves to tell a true alarm from a false one — you can keep that delicacy and still let yourself, now and then, sit somewhere without worrying about a thing."},"奇趣":{"animal":"Prairie Dog","habit":"Its calls are detailed enough to describe a predator's kind, size, even color — and it greets others with a little 'kiss.'","intro":"You're a Prairie Dog — the one in the community who keeps danger clearly announced and keeps everyone close with affection.","strength":"You're a remarkable communicator. Your calls are detailed enough to describe a predator's species, size, even its color, and you greet others with a little 'kiss.' You can pass information along precisely, and you know how to bind everyone together with closeness. And when danger's real, you react fast — one alarm call, a flash back into the burrow, not a moment wasted.","shadow":"But you're so busy watching for danger and passing the word that you rarely have room for your own feelings. You sound the alarm for everyone, yet your own unease is seldom heard; you hold the whole community together, and still you can feel alone inside it.","niche":"You're most valuable in a community that values communication and looks out for each other; in chaos where everyone talks over everyone, you get anxious and worn out. You need a companion willing to listen to you, too.","reframe":"You've announced so much danger for everyone — you deserve someone asking, 'and you?' Turn the alarm down to a whisper now and then and speak your own unease. You're not just the one who carries the news; you're someone worth caring about, too."},"坚韧":{"animal":"Meerkat","habit":"They take turns standing sentry for the whole group, and even teach their pups, step by step, how to handle a venomous scorpion.","intro":"You're a Meerkat — watching over the group and passing on, bit by bit, how to survive.","strength":"You're a born guardian and teacher. You take turns standing watch, always alert for the group; you even teach the pups, hands-on, how to deal with a venomous scorpion. You're vigilant and dependable, passing the skills of survival down to those around you, steadily. And the moment the alarm sounds, you can switch in an instant from standing still to action — moving as one, fast and decisive.","shadow":"But you've stood watch so long you've nearly forgotten you're allowed to come off duty. 'I have to keep watch' has become instinct, and you can't truly relax; busy teaching others how to live, you yourself are rarely cared for or taught.","niche":"You're irreplaceable in a group that needs watching and passing-down; under constant pressure and danger, you get used up. You need companions who can take a shift, so you can sleep in peace too.","reframe":"You don't have to stand every watch alone. Hand the post to someone you trust and go catch up on sleep — a watcher who can let go is the one who lasts. You deserve, now and then, to be watched over, with nothing to keep an eye on."}},"独探续":{"温柔":{"animal":"Sea Turtle","habit":"Alone, it crosses thousands of kilometers of ocean by sensing Earth's magnetic field — and decades later, returns with precision to the very beach where it was born.","intro":"You're a Sea Turtle — able to travel far on your own, while always keeping a homing point you can return to.","strength":"You're independent and resilient. You can cross thousands of kilometers of ocean alone, guided by the planet's magnetic field, and decades later return, precisely, to the beach where you were born. You can keep going without company; inside you is a sense of direction no one can take away.","shadow":"But you're so used to carrying it alone, going it alone, that you travel too far for others to catch up or truly get close. You've made 'I can manage by myself' the default, and slowly, asking for help or walking side by side starts to feel foreign; drift long enough, and you lose touch with people.","niche":"You're most settled where there's freedom and open water, plus a point you can return to; in a relationship that demands you stay present every moment, you suffocate. You need someone who understands, 'I travel far, but I will come back.'","reframe":"Traveling far alone doesn't mean every wave is yours to carry. That homing point inside you can be a person, too — letting someone become your beach won't tether your distance; it'll just give you a light to come back to."},"奇趣":{"animal":"Albatross","habit":"It can glide over the open sea for years on end, barely touching land — and yet it keeps a single mate for life, devoted almost to the point of stubbornness.","intro":"You're an Albatross — seemingly always wandering and alone, yet underneath, holding one fierce and singular tie.","strength":"You belong to the far distance. You can glide over the sea for years on end, barely landing, daring to take a whole unfamiliar ocean as your own territory to roam. You're independent, enduring, unafraid of going far alone — and beneath all that wandering, you keep a single mate for life, devoted almost to stubbornness.","shadow":"But you fly so long and so far that landing itself unsettles you. You savor the vastness of going solo, and you also tend to postpone 'coming ashore' forever; the one you've set your heart on may be waiting for someone who's always up in the sky.","niche":"You're most whole when you can soar freely and still have a shore you truly want to return to; trapped, unable to fly, you wither. You need someone who isn't afraid of how far you go, and trusts that you'll come home.","reframe":"You can keep flying — but don't forget that landing is a skill too. Now and then, fold your wings and stay, solidly, beside that person — coming ashore isn't a cage, it's the reason your far distances mean anything."},"坚韧":{"animal":"Arctic Tern","habit":"Each year it travels alone between the Earth's two poles, chasing an endless summer — the longest migration of any creature on the planet.","intro":"You're an Arctic Tern — chasing the light your whole life, never stopping, turning what others call restlessness into far horizons.","strength":"You have an almost legendary endurance. Each year you travel, alone, between the planet's two poles, chasing a summer that never ends — the farthest-migrating creature on Earth. What others see as restlessness is, in you, a refusal to settle for less. And this longest journey on Earth, you mostly complete on your own.","shadow":"But you can't stop. You've made 'being on the road' your way of existing, and the moment you're still, an emptiness creeps in; you've chased the light your whole life, yet rarely ask whether you also need a place to stop and chase nothing at all.","niche":"You're most alive when there's always a new horizon, a light to keep chasing; in stagnation, repetition, no next journey in sight, you lose your sense of meaning. You need someone who gets this chase, and won't try to talk you into settling down.","reframe":"You've chased the light so long — let yourself stay still in one place sometimes, and let the light come find you instead. Stopping isn't giving up the distance — sometimes it's how you find out what you've been chasing all along."}},"独探冲":{"温柔":{"animal":"Fennec Fox","habit":"Its ears are bigger than its face — big enough to hear prey moving underground — and it can live in the desert on almost no water at all.","intro":"You're a Fennec Fox — busy and nimble on your own, able to make a sweet life even out of scarcity.","strength":"Your senses are sharp, you're quick-witted and self-sufficient. Those ears, bigger than your face, can hear prey moving underground; you can live on almost no water, always finding a way to make something flavorful out of the barest place. On your own, you can make a life that's full and lively. And you're nimble, quick — a sudden dig, a light little leap, a flurry of busyness, and then you settle right back down once you've had your fill.","shadow":"But you're too good at 'digesting it all yourself.' You sense everything, arrange your days neatly alone, and rarely send out an 'I need.' You live so well in the barren places that people assume you lack for nothing and need no looking-after.","niche":"You're happiest where you have your own space and something new to explore; in noise, smothering closeness, or a relationship that gives you no solitude, you get restless. You need someone who respects your independence and still sees that you have needs too.","reframe":"You can live well in scarcity — but you don't always have to be the one who 'lacks for nothing.' Beyond pricking up your ears for others, let others hear what you need too — being cared for won't make you look weak; it'll just add a little sweetness to the lean days."},"奇趣":{"animal":"Octopus","habit":"It has three hearts and 'nine brains' spread through its body, can change color in an instant, use a coconut shell as a tool, and vanish in a cloud of ink.","intro":"You're an Octopus — a one-of-a-kind explorer who goes it alone, thinking with your whole body, three hearts all beating for curiosity.","strength":"You're a born problem-solver. A puzzle you've never seen, a closed door — to you they're invitations; you reach out, learn by trying, until you find a gap no one else thought of and slip through. The moment the environment changes, you take on a new color and texture; alone, you can still explore the world to its depths. Your cleverness is the 'there's always another way' kind.","shadow":"But you're also far too good at disappearing. When things close in, when someone's about to truly see you, your instinct is to spray a cloud of ink, change to a protective color, and slip quietly back to your den. You're used to solving everything alone — you'd sooner figure out how to escape the tank by yourself than send the signal 'I'm stuck.' And that tide-like rhythm of yours — the people around you can't always keep pace.","niche":"You thrive where you have a den entirely your own, the freedom to explore, and a steady stream of fresh puzzles; you wither where you're required to be visible at all times, uniform, unchanging. The people who suit you best are the ones who don't take your disappearances as rejection — and who are curious enough to come tinker alongside you.","reframe":"Changing color, spraying ink, slipping away — these instincts saved you, again and again; they aren't wrong. But you don't have to vanish every time you're seen; some dens are safe enough that you can stay in them without changing color, and let one or two people you trust see you as you really are. And — your 'too much, too strange, too many directions' was never a flaw to be trimmed. That's nine brains."},"坚韧":{"animal":"Hummingbird","habit":"At night it can drop its heartbeat and temperature to near-death to survive the cold; by day it bursts back to full power, wings like lightning, and can even fly backward.","intro":"You're a Hummingbird — able to drop to zero and recharge after burning all the way out, then reignite with astonishing intensity.","strength":"You're small, yet startlingly strong — and always on your own. At night, you can lower your heartbeat and temperature to near-death to outlast the cold; by day, you burst back to full power, wings like lightning, even flying backward — all to reach one freshly opened flower. You have a tireless curiosity about the world, you know how to rest completely and to burn completely, and in that swing lies an intensity others don't have.","shadow":"But that 'all-on or nearly-off' rhythm is hard for outsiders to understand. You burn too bright, then go so still you seem to vanish; people panic when you're in your 'near-death' rest, or can't keep up when you flare. And you tend to push yourself until the tank's bone-dry before you'll stop.","niche":"You're most alive where you're allowed your highs and lows, not forced into an even pace; where constant, steady output is demanded and 'vanishing to charge' isn't allowed, you get wrung out. You need people who understand your rhythm and won't disturb you while you recharge.","reframe":"That near-death rest of yours isn't weakness — it's the reason you can come back to full power. Don't wait until the tank's empty to let yourself stop; choosing to drop to zero and recharge won't cost you that astonishing intensity, it'll just let it burn longer."}},"独守续":{"温柔":{"animal":"Sloth","habit":"It moves so slowly that algae grows on its fur, living a long, steady life on almost no energy, never wasting a scrap of effort on what isn't worth it.","intro":"You're a Sloth — slow, but with the wisdom of saving your energy for what truly matters.","strength":"You hang alone, high in the canopy, with an ease people underrate. You move so slowly that moss grows on your back, and on almost no energy you make your days long and steady. You're so still that the slowness itself becomes your best camouflage — danger often can't even spot you. You don't grasp or compete, yet you have a knack for spending your strength only where it counts — the things others wear themselves out over, you long ago learned to let go.","shadow":"But your slowness is often misread as passivity or stalling. You can also let 'take it slow' turn into 'never get to it,' leaving what you truly want to do stuck in place; you're so good at conserving energy that you sometimes miss the moment to act, the moment to come close.","niche":"You're most at peace where you aren't rushed and can live at your own pace; in an efficiency-driven place where everyone's hurrying, you get pushed along and misunderstood. You need people who get that 'slow is a rhythm too.'","reframe":"Your slowness is wisdom — but don't let it become a permanent standstill. Spend the energy you've saved, generously, on one thing that truly matters now and then — taking it slow doesn't mean never getting there; you deserve to be, for certain things, just a little bit faster."},"奇趣":{"animal":"Pangolin","habit":"The only mammal covered in scales, it rolls into a perfectly sealed ball the moment it's startled — defending itself not by attacking, but by guarding itself completely shut.","intro":"You're a Pangolin — gentle yet armored, harmless, and yet no one can pry open your core.","strength":"You're gentle, but not to be pushed around. As the only scaled mammal, the moment you're startled you roll into a perfectly sealed ball — defending not by attacking, but by guarding yourself airtight. You're quiet, inward, with a protective shell others can't see through. And you can hold out — quietly, unhurriedly carrying on a slow thing for a very long time.","shadow":"But when you curl up, even kindness gets shut out. Your armor guards your core, and it also leaves the ones who genuinely want to come close with no way in; you're so used to defending alone that, over time, even you half-forget what the soft self inside the shell looks like.","niche":"You're most at ease where it's safe, undisturbed, and trust can build slowly; somewhere invasive, demanding you stay open at all times, you instinctively curl tighter. You need patient people, willing to wait for you to open.","reframe":"Your armor is meant to protect your core, not to keep you forever out of reach. With the one or two who've waited so long for you, try loosening, slowly — curling up is safe, but only by unfurling now and then will you learn that some hands come to touch, not to harm."},"坚韧":{"animal":"Mountain Goat","habit":"It evolved special hooves that let it stand, alone, on near-vertical cliffs, picking its path — making a home of the most extreme heights.","intro":"You're a Mountain Goat — the kind who, dropped into any hardship, finds a foothold and makes it bloom.","strength":"You're a born evolver of resilience. The sheer cliffs others avoid, you've evolved special hooves to walk — standing, alone, steady on near-vertical rock, picking your path. You don't fight for the easy plains; you make a home of the most extreme places — able to take pressure, able to adapt, able to root down wherever you land.","shadow":"But you carry so much, so well, that you forget hardship can be shared. You climb the cliffs alone and never cry tired or afraid, letting others assume you need no help; over time, you've made every difficulty 'my own business' by default.","niche":"You shine where there's challenge, somewhere your adaptability gets to work; in too-easy comfort with no slope to climb, you actually get bored. But you also need a place to come down off the cliff, where you don't have to stay braced every second.","reframe":"That you can bloom on a cliff is your gift — but it's not a reason you have to suffer alone. Come down off the rock face sometimes and let someone lend a hand — accepting help won't blunt your resilience; it'll just make the next dangerous stretch a little less lonely."}},"独守冲":{"温柔":{"animal":"Hedgehog","habit":"When threatened, it curls into a ball of spines to protect itself — spines turned outward in defense, never to attack anyone.","intro":"You're a Hedgehog — your power is in guarding yourself well, not in pricking anyone else.","strength":"You're gentle, and you know how to protect yourself. When threatened, you curl into a ball of spines to shield yourself — never to attack. Your spines are for defense, not for harming others; beneath your quiet, you go your own way and don't make a fuss, and under that still surface is an especially soft heart.","shadow":"But you curl up too fast — sometimes before you've even told friend from foe, the spines are already up. Your defense keeps the hurt out, and it keeps the hugs out too; the people who want to come close are often pushed back a step by your reflexive prickle.","niche":"You're most relaxed where it's gentle, safe, and won't suddenly hurt you; in a place full of conflict and intrusion, you stay bristled all the time. You need patient people, who won't walk off just because they got pricked once.","reframe":"Your spines protect that soft heart; they aren't meant to refuse every approach. Try giving yourself half a second before the spines go up, to tell the difference: is this a threat, or a hand reaching out to hold yours? Some people are worth slowly lowering your spines for."},"奇趣":{"animal":"Platypus","habit":"With eyes, ears, and nose shut, it hunts with deadly precision by sensing faint electric fields in the water — and it's a mammal that lays eggs, a body that breaks every category.","intro":"You're a Platypus — reading the world through a 'sixth sense' no one else has, fitting into no ready-made box.","strength":"You're singular to the point of being your own category. With eyes, ears, and nose closed, you hunt with precision just by sensing faint electric fields in the water, and you're a mammal that lays eggs — a body that breaks every classification. You're cautious by nature and not easily drawn out: you watch quietly from beneath the surface, using that intuition no one else has to read your surroundings first, and act only once it feels safe — and the moment you lock on, you dive in fast, quick enough to catch anyone off guard.","shadow":"But 'fitting into no box' also means loneliness. The way you sense things isn't like other people's, and it's often hard to be understood or categorized; you lean so heavily on your own singular intuition that you don't quite trust, or seek, anyone else's view.","niche":"You're most at ease where you're allowed to be 'different' and your odd intuition is appreciated; in a place that demands you fit in and give the standard answer, you feel wrong all over. You need people who won't rush to label you, willing to tune into your unusual frequency.","reframe":"That you fit into no box was never a flaw — it's the most precious thing about you. But don't let 'no one understands' make you trust only your own intuition; now and then, say what you sense aloud and let one or two people try to enter your frequency. One of a kind as you are, you deserve to be understood, not just marveled at."},"坚韧":{"animal":"Pallas's Cat","habit":"It has the densest fur of any cat to withstand the cold; its low, round ears let it press to the ground and peek out from behind a rock, watching without being seen.","intro":"You're a Pallas's Cat — guarding your territory alone, watching without a flicker, then striking fast and sure when it counts.","strength":"You go your own way, self-sufficient on your own ground. You're alert by nature, used to pressing low and watching quietly from behind cover, taking in everything without giving anything away — and when you strike, it's fast and sure, one clean pounce. The colder and harder the place, the more you can carry yourself through on that thick coat of yours.","shadow":"But you hide too well. You're used to tucking yourself behind a rock, slow to show yourself, keeping even your feelings behind a deadpan face; you've weathered the cold alone, and rarely let anyone know that you get cold too. Over time, the people who want to come close can barely catch the moment you peek out.","niche":"You're most settled where you can be alone with your own ground to guard; somewhere loud, demanding you show up at all times, warm and outgoing, you feel wrong in your skin. You need patient people who won't rush you to appear, willing to wait for you to peek out, slowly.","reframe":"That thick coat that's weathered the cold, that unflinching face — they've protected you well. But now and then, you can poke your head out from behind the rock a little more — and let the one or two who've waited so long actually see you. Being seen won't cost you that 'getting through winter alone' skill; it'll just make winter a little less cold."}}}}};
+const DATA = {"zh":{"meta":{"title":"你是一只什么动物","subtitle":"一场温柔的自我照见","note":"10 个问题 · 约 3 分钟 · 没有标准答案","intro":"这不是一个严谨的心理学测试，而是一面镜子。\n它借动物的活法，把你身上独特的地方，换一种方式说给你听。\n凭直觉作答就好——你最先想到的那个，往往最接近你。"},"ui":{"eyebrow":"动物原型 · 一面镜子","start":"开始","back":"← 上一题","qWord":"第","qLast":"最后一题","rPre":"你是一只","habitLabel":"它的奇特之处","secStrength":"你的优势","secShadow":"你的阴影","secNiche":"你的生态位","secReframe":"给你的一句话","again":"再测一次","share":"截图保存，或分享给那个你想更懂的人。","credit":"一面温柔的镜子 · 动物原型测试","toggle":"EN","shareCard":"保存分享图","scHint":"长按图片即可保存，或点击下方下载。","scDownload":"下载图片","scDark":"深","scLight":"浅","scCaption":"扫码，看看你是哪种动物"},"axis":{"social":{"群":"共鸣","独":"独行"},"risk":{"探":"探路","守":"守望"},"tempo":{"冲":"冲刺","续":"长跑"},"tone":{"温柔":"温柔","奇趣":"奇趣","坚韧":"坚韧"}},"questions":[{"dim":"社交","q":"朋友带你去一个几乎没有熟人的轻松聚会，没人指望你做什么，你可以完全随自己。你会自然地——","options":[{"t":"找一两个聊得来的人深入聊，把这一晚过成一场真正的对话","p":"群"},{"t":"在人群里自在穿梭，和很多人都聊上几句，享受热闹","p":"群"},{"t":"找个舒服的位置待着，有人来聊就聊，没人来也不尴尬","p":"独"},{"t":"待到不失礼就准备撤，回到自己的节奏里才真的放松","p":"独"}]},{"dim":"社交","q":"今晚你没什么烦心事，就是单纯地累、想放空，一整晚都属于你自己。哪种安排最让你回血？","options":[{"t":"叫上朋友随便吃点、聊聊天，有人在身边就松了","p":"群"},{"t":"约一两个人一起做件轻松的事，不用多聊，有人同行就好","p":"群"},{"t":"一个人窝着——洗澡、发呆、刷点喜欢的东西，谁都别来找我","p":"独"},{"t":"一个人去做件喜欢的事，自己沉进去最舒服","p":"独"}]},{"dim":"社交","q":"在一个你长期所属的群体里，你更像——","options":[{"t":"把大家串起来的人——记得每个人的事、张罗聚会","p":"群"},{"t":"稳稳在场的一员——不一定张罗，但大家知道你一直都在","p":"群"},{"t":"时来时走的旅人——有联结，但你需要常常离开再回来","p":"独"},{"t":"自成一体的存在——珍惜这个群体，但重心始终在自己身上","p":"独"}]},{"dim":"风险","q":"一个有吸引力但充满未知的机会突然出现。你的第一反应通常是——","options":[{"t":"心先动了，想“先试了再说”，细节边走边补","p":"探"},{"t":"兴奋之余先做点功课，但心里其实已经倾向去了","p":"探"},{"t":"先按住兴奋，问自己“如果出岔子，我会损失什么”","p":"守"},{"t":"第一反应是守住现在拥有的，不轻易为一个未知动现有的盘","p":"守"}]},{"dim":"风险","q":"对一个你在意的人，有些心意你一直没说出口。你更可能——","options":[{"t":"找个时机直接说出来，把不确定摊开总比憋着好","p":"探"},{"t":"用行动或迂回的方式先试探，水温合适了再多走一步","p":"探"},{"t":"反复推演各种反应，确认安全了才敢开口","p":"守"},{"t":"宁可把它守在心里，也不想冒着关系受损的风险","p":"守"}]},{"dim":"风险","q":"你独自到了一个完全陌生的地方（没来过的城市、语言不通的环境）。你最先做的是——","options":[{"t":"直接出门乱逛，迷路也没关系，乱走才有惊喜","p":"探"},{"t":"直奔最有意思的地标、市场、巷子，跟着好奇心一路走","p":"探"},{"t":"先把周边摸清——出口、回程、哪里安全，心里有底才放松","p":"守"},{"t":"先安顿好一个让你安心的据点，再从那里慢慢往外探","p":"守"}]},{"dim":"节奏","q":"接下一件你真正在乎的事，从头到尾，你的投入通常是什么形状？","options":[{"t":"一上来就猛扎进去、高强度推进，然后需要彻底歇一阵再回来","p":"冲"},{"t":"状态来的时候疯狂输出，没状态就停，呈一波一波的","p":"冲"},{"t":"每天稳定推进一点，不快但几乎不断线","p":"续"},{"t":"配好自己的速度、留有余力，均匀地走到终点","p":"续"}]},{"dim":"节奏","q":"什么时候你最容易进入“全力以赴”的状态？","options":[{"t":"临近截止、压力顶上来时，肾上腺素一来就爆发","p":"冲"},{"t":"遇到特别带感的新东西，新鲜感一上头就停不下来","p":"冲"},{"t":"当它长成日常的一部分，靠习惯和节律自然推进","p":"续"},{"t":"看到长远的意义，靠这份笃定细水长流地走","p":"续"}]},{"dim":"节奏","q":"如果让你设计自己理想的生活节奏，更接近——","options":[{"t":"一阵全情投入的“旺季”，接着一段彻底放空的“淡季”，张弛分明","p":"冲"},{"t":"短周期切换——冲一段、换个事、再冲一段，保持新鲜","p":"冲"},{"t":"每天都差不多的稳定节律，靠日复一日的累积慢慢变好","p":"续"},{"t":"不疾不徐地长期深耕一两件事，享受慢慢来的过程","p":"续"}]},{"dim":"底色","q":"最后一个：如果要说你身上最特别、最“不一样”的那一点，更接近——","options":[{"t":"你有种让人安心的能量——在你身边，别人会不自觉地松下来","p":"温柔"},{"t":"你总有些出人意料的地方——越了解你，越觉得“原来人还能这样”","p":"奇趣"},{"t":"你身上有股安静的韧劲——再难的处境，你都能自己扛过去、还活出花来","p":"坚韧"}]}],"results":{"群探续":{"温柔":{"animal":"大雁","habit":"飞行时会轮流飞到最前面分担阻力，有同伴掉队，会有两只陪着它一起留下。","intro":"你是一只大雁——天生愿意带着大家一起远行的那种人。","strength":"你心里总装着“我们”。你敢于一次次朝远方启程，愿意为了一个值得奔赴的目标长途跋涉，也懂得在飞行中轮流到最前面分担阻力，让队伍走得更省力、更远。你的勇气是温暖的、带着同伴的。","shadow":"但你太容易把整个队伍的重量背在自己肩上。有谁掉了队，你会本能地慢下来陪着——哪怕代价是耗尽自己。你不太允许自己飞在中间、被别人托一把。","niche":"你在有共同方向、有人同行的地方最有光；在各自为政、没有目标的环境里会慢慢失去力气。你需要的，是一群愿意轮流领飞的伙伴。","reframe":"你不必永远飞在最前面。允许自己偶尔掉到队伍中间，让风替你挡一会儿——被托住，不是软弱，是你也值得的休息。"},"奇趣":{"animal":"座头鲸","habit":"会唱出复杂悠长的歌，还会在看到别的物种被虎鲸围猎时，挺身去保护跟自己毫无关系的它们。","intro":"你是一只座头鲸——一个会把善意唱成歌、还会唱给陌生人听的存在。","strength":"你有种超出“自己人”的善良。你会唱出复杂悠长的歌，也能横跨整片大洋、完成漫长的迁徙，还会在看到别的物种被虎鲸围猎时毫不犹豫地挺身介入——哪怕那和你毫无关系。你的关怀辽阔，你敢于出手的胆识，也一样辽阔。","shadow":"但你常常先想着别人、把自己的需要排到很后面。你为陌生人停下、为不相干的事出力，回过头却发现没人替你停一停。你的辽阔，有时也是一种把自己摊得太薄。","niche":"你在能施展善意、又懂得珍惜你的环境里最自在；在只讲利害、不讲情义的地方会觉得格格不入。你需要同样辽阔的人，才接得住你的辽阔。","reframe":"你可以为陌生人挺身，也请记得为自己挺身一次。把那首歌偶尔唱给自己听——你的善意，也该有一部分留给你自己。"},"坚韧":{"animal":"角马","habit":"年复一年穿越草原、强渡满是危险的大河，完成地表最壮观的迁徙之一，靠整群的勇气过关。","intro":"你是一只角马——在大队伍里一往无前、再险也跟着闯过去的人。","strength":"你有一种集体性的勇气。年复一年，你和同伴一起穿越草原、强渡险河，不是因为不怕，而是因为“大家一起”就敢。你耐得住长途，也扛得住关口。","shadow":"但你太习惯随着大队伍前进，有时来不及问自己“我想去哪”。你把方向交给了集体的洪流，个人的声音容易被淹没；停下来、掉队，会让你莫名不安。","niche":"你在有共同征途、彼此信任的群体里最强大；在一盘散沙、各自打算的环境里会失去方向感。你需要值得一起渡河的同伴。","reframe":"跟着大队伍很有力量，但偶尔，也值得问问那个被洪流盖住的声音：这条河，是你想渡的吗？你既能随群奔腾，也有权选自己的方向。"}},"群探冲":{"温柔":{"animal":"海獭","habit":"睡觉时会和同伴手拉手，免得在睡梦里漂散；还会随身带一块自己最爱的石头。","intro":"你是一只海獭——在关系里柔软、会照顾人、还守着自己小珍宝的那种人。","strength":"你给得出温度。睡觉时你会和同伴手拉手，免得在睡梦里漂散；你贪玩、好奇、来得快，能轻易把欢乐带给身边的人。你也懂得守护只属于自己的那点珍宝。","shadow":"但你的能量是一阵一阵的——尽兴之后需要漂回水面歇一歇。别人未必懂你这种“忽然安静”，容易误以为你变冷淡了。你也怕一松手，重要的人就漂走了。","niche":"你在能一起玩闹、又允许你回血的关系里最舒展；在要求你时刻热情、不能喊累的环境里会被掏空。你需要不把你的“暂停”当成疏远的人。","reframe":"你不必一直拉着所有人的手。允许自己先漂回水面、把自己照顾好——你松开的那只手，信任的人不会就此漂走。"},"奇趣":{"animal":"渡鸦","habit":"会纯粹为了好玩从雪坡上滑下来，还会给善待过它的人叼来小石子、小亮片当礼物。","intro":"你是一只渡鸦——聪明、贪玩、记恩，越相处越让人惊喜的存在。","strength":"你机灵得不像话。你会纯粹为了好玩从雪坡上滑下来，也会给善待过你的人叼来一件小礼物。你的脑子转得飞快，记得谁对你好，也总能给关系制造意外的惊喜。你的劲头是一阵一阵的：兴致说来就来，一头扎进去玩个痛快，尽兴了便抽身。","shadow":"但你的聪明有时也让你藏起真心。你用玩笑、机巧和小礼物去靠近人，却不太轻易把脆弱的那一面交出来。别人觉得你有趣，却未必觉得自己真正走进了你。","niche":"你在欣赏你的古灵精怪、又愿意陪你玩的人身边最闪光；在死板、不解风情的环境里会觉得无趣又拘束。你需要聪明到能接住你梗的人。","reframe":"你不必总用机巧和礼物来换亲近。偶尔放下那只叼着礼物的嘴，直接说一句真心话——你本身就足够有趣，不靠表演也值得被靠近。"},"坚韧":{"animal":"阿德利企鹅","habit":"在严寒的海里成群跃出水面、横冲直撞，常常是那个先跳下水、再回头招呼同伴的莽撞家伙。","intro":"你是一只阿德利企鹅——群体里那个一头扎进去、带着大家往前冲的人。","strength":"你胆子大得不像话。在严寒的海里，你会成群跃出水面、横冲直撞，半点不犹豫。你有股莽撞又可爱的冲劲，常常是那个先跳下去、再回头喊大家“水里没事，来吧”的人。","shadow":"但你冲在前面久了，也会忘了自己其实也会怕、也会累。你把犹豫藏起来，用行动盖过不安；等到撑不住时，旁人才惊讶“原来你也会倒下”。","niche":"你在需要有人带头、又彼此扶持的群体里最有价值；在人人观望、没人敢动的环境里会孤立无援。你需要既能跟你一起冲、也能在你累时接住你的同伴。","reframe":"带头跳下水很勇敢，但你也允许自己喊一声“我有点怕”。把不安说出来，不会削弱你的勇气——真正的硬核，是连脆弱也敢承认。"}},"群守续":{"温柔":{"animal":"大象","habit":"能用地面的震动在几公里外和同伴“对话”，还会在同伴逝去的地方久久停留、默哀。","intro":"你是一只大象——群体里最长情、连别人的悲伤都接得住的守护者。","strength":"你稳，而且深情。你能用地面的震动在几公里外和同伴“对话”，也会为逝去的伙伴久久默哀。你警觉地守护着整个族群，是那个让大家有安全感的存在。","shadow":"但你把所有人的安危都背在身上，自己的疲惫却很少说出口。你太擅长接住别人，以至于忘了自己也会撑不住；放下责任，对你来说几乎是种罪恶感。","niche":"你在稳定、需要被守护和照料的群体里最有光；在动荡、人人自顾的环境里会心力交瘁。你需要一个也会回头守护你的族群。","reframe":"守护者也需要被守护。你接住了那么多人的重量，也请允许有人来接住你——把疲惫说出口，不会让你不再可靠，只会让你不再独自硬撑。"},"奇趣":{"animal":"帝企鹅","habit":"在零下几十度里挤成一团取暖时，会不断轮换位置，让每一只都轮流站到最暖的中心、也轮流去外圈挡风。","intro":"你是一只帝企鹅——懂得让每个人都轮流被照顾到的那种人。","strength":"你的善良很有智慧。在零下几十度里，你们挤成一团取暖，却不断轮换位置，让每一只都轮流站到最暖的中心、也轮流去外圈挡风。你天生懂得公平地分担艰难，不让谁一直受冻。而在最冷的时候，你也是那个把那枚蛋稳稳护在脚背上、不吃不喝熬过整个寒冬的守望者。","shadow":"但你太执着于“让每个人都被照顾到”，常常把自己排在最后那一班岗。你默默多站了几轮外圈，却觉得理所当然；久而久之，没人意识到你其实也冷。","niche":"你在懂得轮流、彼此扛事的群体里最温暖；在只索取、不轮班的环境里会被冻透。你需要同样愿意替你挡风的人。","reframe":"你为大家轮值了那么多回，也该轮到你站进最暖的中心了。让别人替你挡一次风——你照顾了所有人，自己也在“所有人”里面。"},"坚韧":{"animal":"麝牛","habit":"遇到危险时，成年个体会围成一圈、把幼崽护在中间，一律面朝外、用身体硬扛冰河时代般的严寒与猛兽。","intro":"你是一只麝牛——护人的方式是把弱者圈进来、自己面朝危险的人。","strength":"你有一种沉默的、硬核的守护力。遇到危险时，你们会围成一圈、把幼崽护在中间，成年个体一律面朝外站着扛。你能硬扛冰河时代般的严寒，也能为身后的人挡住最冷的风。","shadow":"但你总把自己放在最外圈、面朝风暴，很少让别人看到你也会被冻伤。你用“我来扛”挡住了所有担心，却也挡住了别人靠近、心疼你的机会。","niche":"你在需要被保护、值得你守的群体里最强大；在没人值得守、或没人懂你守护的环境里会觉得孤独又疲惫。你需要圈内的人偶尔回头看你一眼。","reframe":"你面朝风暴站了很久。偶尔转过身来，让圈里的人也为你挡一次风——被保护，不会让你不再是那头扛事的麝牛，只会让你扛得久一点。"}},"群守冲":{"温柔":{"animal":"梅花鹿","habit":"成群而居、极度警觉，一丝风吹草动都逃不过它，察觉不对便能轻盈地一跃而起。","intro":"你是一只梅花鹿——心思细、感知快，总能第一个察觉氛围变化的人。","strength":"你敏感得优雅。成群生活的你极度警觉，一丝风吹草动都逃不过你，察觉到不对便能轻盈地一跃而起。你对人和气氛有种天生的细腻，常常是最先读懂房间里情绪的那一个。","shadow":"但你的敏感也让你容易紧绷。别人没察觉的细微变化会牵动你一整天，你替大家提前担心，神经却很难真正松下来。有时危险还没来，你已经先累了。","niche":"你在温和、可预期、彼此体贴的群体里最自在；在动荡、充满冲突的环境里会被持续的警觉掏空。你需要能让你放下戒备、安心吃草的草原。","reframe":"你的敏锐是天赋，但不是每一次风吹草动都意味着危险。试着教自己的神经分辨真假警报——你可以一边保有这份细腻，一边允许自己偶尔什么都不担心地待一会儿。"},"奇趣":{"animal":"草原犬鼠","habit":"叫声复杂到能描述天敌的种类、大小甚至颜色，见面还会用“亲吻”来打招呼。","intro":"你是一只草原犬鼠——群体里把危险讲清楚、也用亲昵维系大家的“播报员”。","strength":"你是个了不起的沟通者。你的叫声复杂到能描述天敌的种类、大小甚至颜色，见面还会用“亲吻”来打招呼。你既能精准地把信息传出去，又懂得用亲密把大家连在一起。而真有危险时，你反应极快——一声警报、瞬间窜回洞里，半点不拖。","shadow":"但你太忙着替大家盯着危险、传递消息，常常没空照顾自己的情绪。你把警报喊给所有人听，自己心里的不安却很少有人听见；你维系着整个社群，却容易在其中感到孤单。","niche":"你在重视沟通、彼此照应的群体里最有价值；在信息混乱、各说各话的环境里会焦虑又疲惫。你需要一个也愿意听你说说话的同伴。","reframe":"你替大家播报了那么多危险，也值得有人问一句“那你呢？”。把警报偶尔调成悄悄话，说说自己的不安——你不只是那个报信的，你也是值得被关心的那一个。"},"坚韧":{"animal":"狐獴","habit":"会轮流站岗放哨、为整群警戒，还会手把手地教幼崽怎么对付有毒的蝎子。","intro":"你是一只狐獴——守望着集体、把“如何活下去”一点点传下去的人。","strength":"你是天生的守护者兼老师。你们轮流站岗放哨，时刻为群体警戒；你还会手把手地教幼崽怎么对付有毒的蝎子。你既警觉又有担当，把生存的本事踏实地传给身边的人。而哨声一响，你又能瞬间从静立切换成行动，群起而上、快而果断。","shadow":"但你站岗站得太久，几乎忘了自己也有下哨的时候。你把“我得盯着”变成了本能，难以真正放松；你忙着教别人怎么活，自己却很少被照顾、被教导。","niche":"你在需要警戒和传承的群体里不可替代；在长期高压、危机四伏的环境里会被耗尽。你需要可以轮班的同伴，让你也能安心睡一觉。","reframe":"你不必一个人站完所有的岗。把哨位交给信得过的伙伴，去补个觉——会放手的守望者，才守得长久。你也值得偶尔被守护着、什么都不用盯。"}},"独探续":{"温柔":{"animal":"海龟","habit":"独自靠地磁场穿越几千公里的海洋，几十年后还能精准回到自己出生的那片沙滩。","intro":"你是一只海龟——一个人也能走很远、心里却始终有个回得去的原点的人。","strength":"你独立又有韧性。你能独自靠着地磁场穿越几千公里的海洋，几十年后，还能精准地回到自己出生的那片沙滩。你不需要陪伴也能坚持，内心有一个谁都拿不走的方向感。","shadow":"但你太习惯一个人扛、一个人走，远到别人很难追上你、也很难真正靠近。你把“我能自己来”当成默认，渐渐地，连求助和并肩都变得陌生；漂泊久了，会与人慢慢失了联系。","niche":"你在拥有自由和广阔天地、又有一个能回去的原点的环境里最安定；在要求你时刻在场、寸步不离的关系里会窒息。你需要懂得“我走得远，但我会回来”的人。","reframe":"一个人走得远，不代表所有的浪都要自己扛。你心里那个回得去的原点，也可以是某个人——让某些人成为你的沙滩，不会拖住你远行，只会让你回来时有灯。"},"奇趣":{"animal":"信天翁","habit":"能连续在海上滑翔好几年、几乎不落地，把整片大洋当成家；而一生只认一个伴侣，专一得近乎执拗。","intro":"你是一只信天翁——看似常年漂泊、独来独往，深处却有一份极其专一的牵系。","strength":"你天生属于远方。你能连续在海上滑翔好几年、几乎不落地，敢独自把整片陌生的大洋当成疆域去闯。你独立、耐久、不惧孤身远行——而在这份漂泊之下，你一生只认一个伴侣，专一得近乎执拗。","shadow":"但你飞得太久太远，落地反而让你不安。你享受独行的辽阔，却也容易把“靠岸”无限推迟；那个你深深认定的人，可能在等一个总是在天上的你。","niche":"你在能自由翱翔、又有一处真正想回的岸的状态里最完整；在被困住、不能飞的环境里会枯萎。你需要一个不怕你飞远、也相信你会归来的人。","reframe":"你可以一直飞，但别忘了落地也是一种能力。偶尔收起翅膀、踏踏实实地待在那个人身边——靠岸不是束缚，是让你的远方有了意义的原因。"},"坚韧":{"animal":"北极燕鸥","habit":"每年在地球的南北两极之间往返，追着那永不落幕的夏天，是这颗星球上迁徙最远的生物。","intro":"你是一只北极燕鸥——一生都在追光、不肯停，把别人眼里的“折腾”活成了远方的人。","strength":"你有近乎传奇的耐力。你每年独自往返于地球的南北两极之间，追着那永不落幕的夏天，是这颗星球上迁徙最远的生物。别人眼里的折腾，在你这里是一种不肯将就的执着——而这条地表最长的迁徙，你大多是一个人走完的。","shadow":"但你停不下来。你把“在路上”当成了存在的方式，一旦静止就莫名空落落的；你追了一生的光，却很少问自己，是不是也需要一处可以停下来、什么都不追的地方。","niche":"你在不断有新的远方、可以一直追光的状态里最有生命力；在停滞、重复、看不到下一段旅程的环境里会失去意义感。你需要懂你这份“追光”、不劝你安定的人。","reframe":"你追了那么久的光，也允许自己偶尔停在原地，让光来找你一次。停下来不等于放弃远方——有时候，是为了确认自己到底在追什么。"}},"独探冲":{"温柔":{"animal":"耳廓狐","habit":"耳朵比脸还大，能听见猎物在地下走动；几乎不靠喝水，全凭食物里的水分就能在沙漠活下去。","intro":"你是一只耳廓狐——一个人灵巧地忙碌着、能在贫瘠里把日子过出滋味的人。","strength":"你感官敏锐、机灵又自足。你那对比脸还大的耳朵，能听见猎物在地下走动；你几乎不靠喝水也能活，总有办法在最贫瘠的地方为自己找到滋味。你一个人，也能把生活打理得有声有色。你动作敏捷、来得快——猛地刨土、轻巧弹跳，一阵风似的忙活，尽兴后又能立刻安静下来。","shadow":"但你太会“自己消化”了。你机敏地察觉一切、独自把日子安排妥当，却很少向别人发出“我需要”的信号。你在贫瘠里活得太好，反而让人以为你什么都不缺、不用被照顾。","niche":"你在有自己的空间、又有新鲜事可探的环境里最快活；在嘈杂、过度黏腻、不给你独处的关系里会烦躁。你需要既尊重你的独立、又看得见你也有需要的人。","reframe":"你能在贫瘠里活得很好，但你不必总是“什么都不缺”。竖起耳朵听别人之余，也让别人听见你的需要——被照顾，不会让你显得脆弱，只会让贫瘠的日子多一点甜。"},"奇趣":{"animal":"章鱼","habit":"有三颗心脏、分布在全身的“九个脑”，能瞬间变色、用椰子壳当工具，遇险时喷一团墨溜走。","intro":"你是一只章鱼——一个自成一类的独行探险家，用整副身体在思考、三颗心脏全为好奇而跳。","strength":"你天生是个解题者。一道没见过的难题、一扇关着的门，对你都像邀请——你会伸出手，边试边学，直到找到一条别人没想到的缝隙钻过去。环境一变，你瞬间换上新的颜色与质地；独自一人，照样能把世界探个底朝天。你的聪明，是“换个方向总有办法”的那种。","shadow":"但你也太擅长消失了。当事情逼近、当有人快要看清你，你的本能是喷出一团墨、换上保护色，悄悄退回自己的洞穴。你习惯独自解决一切——宁可一个人想办法逃出鱼缸，也不愿发出“我卡住了”的信号。而你那来去如潮的节奏，身边的人未必跟得上。","niche":"你在有一个完全属于你的洞穴、有探索的自由、有源源不断新鲜难题的地方如鱼得水；在要求时刻可见、整齐划一、一成不变的环境里枯萎。最适合你的人，是那种不把你的消失当成拒绝、又好奇到愿意陪你一起折腾的人。","reframe":"变色、喷墨、溜走——这些本能曾一次次救过你，它们没有错。但你不必每次被看见都先消失；有些洞穴足够安全，安全到你可以不换颜色地待在里面，被一两个信得过的人看见原本的样子。还有——你那“太多、太怪、太多方向”从来不是要被修剪的毛病，那是九个大脑。"},"坚韧":{"animal":"蜂鸟","habit":"夜里能把心跳和体温降到近乎假死来熬过寒冷，白天又满血爆发、振翅如电，甚至能倒着飞。","intro":"你是一只蜂鸟——能在彻底耗尽后归零回血、再以惊人强度重新点燃自己的人。","strength":"你小，却强得惊人，而且总是独来独往。夜里，你能把心跳和体温降到近乎假死，来熬过寒冷；白天，你又满血爆发、振翅如电，甚至能倒着飞——只为追上一朵刚开的新花。你对世界有股不知疲倦的好奇，懂得彻底地休息，也懂得彻底地燃烧，张弛之间藏着别人没有的强度。","shadow":"但你那种“要么全开、要么近乎停摆”的节奏，外人很难理解。你燃烧时太亮，停摆时又像消失，别人容易在你“假死”的时候慌张，或在你爆发时跟不上。你也容易把自己逼到燃料见底才肯停。","niche":"你在能允许你大起大落、不必匀速前进的环境里最有生命力；在要求你恒定输出、不能“消失充电”的环境里会被榨干。你需要懂得你的节奏、不在你回血时打扰你的人。","reframe":"你那近乎假死的休息，不是软弱，是你能再次满血的原因。别等燃料见底才允许自己停——主动归零回血，不会让你失去那身惊人的强度，只会让它烧得更久。"}},"独守续":{"温柔":{"animal":"树懒","habit":"慢到背上都长出了青苔，靠极低的消耗把日子过得很长，从不为不值得的事浪费一丝力气。","intro":"你是一只树懒——慢，但那是一种把能量省给真正重要之事的智慧。","strength":"你独自挂在高高的树冠上，有一种被低估的从容。你慢到背上都长出了青苔，靠着极低的消耗，把日子过得很长、很稳。你慢到几乎不动，慢本身反倒成了最好的保护色——危险常常认不出你。你不争不抢，却自有一套把力气用在刀刃上的智慧——别人在内耗的事，你早已学会放过。","shadow":"但你的慢，常被外界误读成消极或拖延。你也容易把“慢慢来”变成“一直不来”，让真正想做的事停在原地；你太擅长保存能量，有时连该出手、该靠近的时刻也错过了。","niche":"你在不被催促、可以按自己节奏生活的环境里最安宁；在追求效率、人人赶路的环境里会被推着走、被误解。你需要懂得“慢也是一种节奏”的人。","reframe":"你的慢是智慧，但别让它变成永远的停留。把省下来的能量，偶尔大方地花在一件真正重要的事上——慢慢来不等于不来，你值得为某些事，稍微快一点点。"},"奇趣":{"animal":"穿山甲","habit":"是唯一一种披着鳞甲的哺乳动物，一受惊就卷成一颗严丝合缝的球——不靠攻击，靠把自己守得密不透风。","intro":"你是一只穿山甲——温和又自带盔甲，不伤人，却谁也撬不开你的核心。","strength":"你温柔，却不好欺负。作为唯一一种披着鳞甲的哺乳动物，你一受惊就卷成一颗严丝合缝的球——不靠攻击，靠的是把自己守得密不透风。你安静、内敛，有一层别人看不透的保护壳。你也耐得住——能安安静静、不慌不忙地把一件慢事做上很久。","shadow":"但你卷起来的时候，连善意也被挡在了外面。你用盔甲护住了核心，也让真正想靠近的人无从下手；你太习惯独自防御，久了，连自己都快忘了壳里那个柔软的你长什么样。","niche":"你在安全、不被打扰、能慢慢建立信任的环境里最舒展；在充满侵入感、要求你时刻敞开的环境里会本能地卷紧。你需要有耐心、愿意等你慢慢打开的人。","reframe":"你的盔甲是用来保护核心的，不是用来永远不被靠近的。对那一两个等了你很久的人，试着慢慢松开一点——卷起来很安全，但偶尔舒展开，你才会知道，原来有些手是来抚摸、不是来伤害的。"},"坚韧":{"animal":"落基山岩羊","habit":"进化出特殊的蹄子，能独自稳稳踩在近乎垂直的峭壁上择路，把最极端的高山活成了自己的家。","intro":"你是一只落基山岩羊——无论被丢到多难的处境，都能找到立足点、活出花来的人。","strength":"你是天生的韧性进化者。别人躲开的悬崖峭壁，你却进化出特殊的蹄子，独自稳稳踩在近乎垂直的岩壁上择路而行。你不去争抢平原，而是把最极端的环境活成了自己的家——抗压、能调适，落到哪里都能扎根。","shadow":"但你太能扛了，扛到忘了“难”也是可以被分担的。你独自攀在峭壁上，从不喊累、不喊险，让别人以为你不需要帮助；久而久之，你把所有的难都默认成“我自己的事”。","niche":"你在有挑战、能让你施展适应力的环境里最有光；在过于安逸、没有坡可爬的地方反而会觉得无趣。但你也需要一处可以下山、不必时刻紧绷的歇脚地。","reframe":"你能在峭壁上活出花来，这是你的天赋，但不是你必须独自受苦的理由。偶尔从崖壁上下来、让别人搭把手——接受帮助，不会削弱你的韧性，只会让你在下一段险路上，走得不那么孤单。"}},"独守冲":{"温柔":{"animal":"刺猬","habit":"受到威胁时会卷成一颗刺球护住自己——刺是向内防御的，从不主动去攻击谁。","intro":"你是一只刺猬——你的力量是把自己守好，而不是去刺伤别人。","strength":"你温柔，且懂得自我保护。受到威胁时，你会卷成一颗刺球护住自己——从不主动去攻击谁。你的刺是向内防御的，不是向外伤人的；你独来独往、不爱声张，安静的外表下其实有一颗格外柔软的心。","shadow":"但你卷起来太快了，有时还没分清对方是敌是友，就先竖起了刺。你用防御挡住了伤害，也挡住了拥抱；那些想靠近的人，常被你下意识的刺退了一步。","niche":"你在温和、安全、不会突然伤害你的环境里最放松；在充满冲突和侵犯的环境里会一直紧绷着刺。你需要有耐心、不会因为被扎一下就走开的人。","reframe":"你的刺是为了保护那颗柔软的心，不是为了拒绝所有的靠近。试着在竖刺之前，多给半秒去分辨：这是威胁，还是一只伸过来想牵你的手？有些人，值得你慢慢把刺收起来。"},"奇趣":{"animal":"鸭嘴兽","habit":"能闭着眼、耳、鼻，仅凭感知水里微弱的电场就精准捕猎；还是个会下蛋的哺乳动物，一身打破分类的特征。","intro":"你是一只鸭嘴兽——靠别人没有的“第六感”读这个世界、怎么都装不进现成格子的人。","strength":"你独特到自成一类。你能闭着眼、耳、鼻，仅凭感知水里微弱的电场就精准捕猎，还是会下蛋的哺乳动物——一身打破分类的特征。你天性谨慎、不轻易现身：总在水面之下悄悄观察，先用那套别人没有的直觉把周遭摸清、确认安全了才出手；而一旦锁定，你又能一个猛子扎下去，快得让人措手不及。","shadow":"但“装不进任何格子”也意味着孤独。你的感知方式和别人不一样，常常难以被理解、被归类；你太依赖自己那套独特的直觉，反而不太相信、也不太寻求别人的视角。","niche":"你在允许你“不一样”、欣赏你独特直觉的环境里最自在；在要求你合群、按标准答案来的环境里会浑身不对劲。你需要不急着给你贴标签、愿意理解你独特频率的人。","reframe":"你装不进任何格子，这从来不是缺陷，而是你最珍贵的地方。但别因为“没人懂”就只信自己的直觉——偶尔把你感知到的说出来，让一两个人试着进入你的频率。自成一类的你，也值得被理解，而不只是被惊叹。"},"坚韧":{"animal":"兔狲","habit":"拥有猫科里最浓密的毛发来扛严寒；耳朵又低又圆，好让它贴着地、藏在石头后悄悄探出头观察，而不被发现。","intro":"你是一只兔狲——独自守在领地里、不动声色地观察，关键时刻却又快又准的人。","strength":"你独来独往，在自己的地盘里自给自足。你天生警觉，习惯贴着地、藏在掩体后静静观察，不动声色地把周遭看个清楚——出手时却又快又准，一个扑击干脆利落。再冷再难的地方，你都能靠自己那身“厚底子”稳稳扛过去。","shadow":"但你藏得太好了。你习惯把自己缩在石头后面、不轻易现身，连情绪都板着一张脸不让人看出来；你独自扛过严寒，却很少让人知道你也会冷。久了，想靠近你的人，连你探出头的那一刻都很难等到。","niche":"你在能让你独处、又有自己地盘可守的环境里最安定；在喧闹、需要你时刻露面、热情外向的环境里会浑身别扭。你需要有耐心、不催你现身、愿意慢慢等你探出头的人。","reframe":"你那身扛过严寒的厚毛、那张不动声色的脸，都曾好好地保护过你。但偶尔，你可以从石头后面多探出一点点头——让一两个等了很久的人看见你。被看见，不会让你失去那份独自过冬的本事，只会让冬天没那么冷。"}}}},"en":{"meta":{"title":"What Animal Are You?","subtitle":"A gentle way of seeing yourself","note":"10 questions · about 3 minutes · no right answers","intro":"This isn't a rigorous psychology test — it's a mirror.\nIt borrows the way animals live to tell you, in another voice, what's unusual about you.\nJust answer on instinct. The first thing that comes to mind is usually the truest."},"ui":{"eyebrow":"Animal archetype · a mirror","start":"Begin","back":"← Back","qWord":"Question ","qLast":"Last question","rPre":"You are","habitLabel":"What makes it remarkable","secStrength":"Your strengths","secShadow":"Your shadow","secNiche":"Where you thrive","secReframe":"A few words for you","again":"Take it again","share":"Screenshot it, or send it to someone you'd like to understand a little better.","credit":"A gentle mirror · an animal archetype quiz","toggle":"中","shareCard":"Save as image","scHint":"Long-press the image to save it, or download below.","scDownload":"Download","scDark":"Dark","scLight":"Light","scCaption":"Scan to find your animal"},"axis":{"social":{"群":"Social","独":"Solitary"},"risk":{"探":"Explorer","守":"Watcher"},"tempo":{"冲":"Sprinter","续":"Endurer"},"tone":{"温柔":"Tender","奇趣":"Singular","坚韧":"Resilient"}},"questions":[{"q":"A friend brings you to a relaxed gathering where you barely know anyone, and nothing is expected of you. You'd naturally—","options":[{"t":"Find one or two people you click with and sink into a real conversation"},{"t":"Drift easily through the room, trade a few words with lots of people, enjoy the buzz"},{"t":"Settle into a comfortable spot — chat if someone comes by, perfectly fine if no one does"},{"t":"Stay just long enough to be polite, then slip back to your own rhythm to really relax"}]},{"q":"Tonight nothing's bothering you — you're just tired and want to switch off, and the whole evening is yours. What restores you most?","options":[{"t":"Grab a bite and chat with friends — having people around loosens you up"},{"t":"Do something light with a person or two — no need to talk much, company is enough"},{"t":"Curl up alone — a shower, some daydreaming, scrolling something you love, nobody bothering you"},{"t":"Lose yourself in something of your own — the kind of thing you can sink right into"}]},{"q":"In a group you've belonged to for a while, you're more like—","options":[{"t":"The one who holds everyone together — remembers each person, plans the get-togethers"},{"t":"A steady presence — not always the organizer, but everyone knows you're always there"},{"t":"A wanderer who comes and goes — connected, but you need to keep leaving and returning"},{"t":"A world of your own — you treasure the group, but your center always stays with you"}]},{"q":"An appealing but uncertain opportunity suddenly appears. Your first instinct is usually—","options":[{"t":"Your heart's already in — 'let's just try it,' and figure out the details on the way"},{"t":"Excited, but you do a little homework first — though honestly you're already leaning yes"},{"t":"Hold the excitement back and ask, 'if this goes wrong, what do I stand to lose?'"},{"t":"Your first move is to protect what you already have, not gamble it on an unknown"}]},{"q":"There's something you've never said to someone you care about. You're more likely to—","options":[{"t":"Find the moment and just say it — better out in the open than bottled up"},{"t":"Test the waters through actions or hints first, then take another step if it feels right"},{"t":"Run through every possible reaction in your head, and only speak once it feels safe"},{"t":"Rather keep it to yourself than risk damaging the relationship"}]},{"q":"You've arrived alone somewhere completely unfamiliar — a new city, a place where you don't speak the language. The first thing you do is—","options":[{"t":"Head straight out and wander — getting lost is fine, that's where the surprises are"},{"t":"Make a beeline for the most interesting landmark, market, or alley, following your curiosity"},{"t":"Get your bearings first — exits, the way back, where's safe — you relax once you know"},{"t":"Set up a base that feels secure, then explore outward from there, little by little"}]},{"q":"When you take on something you truly care about, what shape does your effort usually take?","options":[{"t":"Dive in hard from the start, push at full intensity, then need a real break before coming back"},{"t":"Pour it out when the mood strikes, stop when it doesn't — it comes in waves"},{"t":"Move it forward a little every day — not fast, but almost never breaking the thread"},{"t":"Set your own pace, keep some in reserve, and arrive evenly at the finish"}]},{"q":"When are you most likely to hit full throttle?","options":[{"t":"When a deadline looms and the pressure's on — the adrenaline kicks in and you burst"},{"t":"When something new and exciting shows up — the novelty grabs you and you can't stop"},{"t":"Once it's become part of your routine — habit and rhythm carry it along"},{"t":"When you can see the long-term meaning — that conviction keeps you going, slow and steady"}]},{"q":"If you could design your ideal rhythm of life, it'd be closer to—","options":[{"t":"A 'high season' of total immersion, then a 'low season' of switching off completely — clear swings"},{"t":"Short cycles — sprint at one thing, switch, sprint again, keep it fresh"},{"t":"A steady daily rhythm, getting better through patient, day-by-day accumulation"},{"t":"Tending one or two things for the long haul, savoring the slow unfolding"}]},{"q":"Last one: the most singular, most 'unlike-anyone-else' thing about you is closer to—","options":[{"t":"You have a calming presence — people relax without realizing it when they're near you"},{"t":"You're full of the unexpected — the better people know you, the more they think, 'I didn't know a person could be like this'"},{"t":"There's a quiet toughness in you — drop you anywhere, and you'll find a way to get through, and even bloom"}]}],"results":{"群探续":{"温柔":{"animal":"Wild Goose","habit":"When they fly, they take turns at the front to break the wind for the others; and if one falls behind, two will stay back to keep it company.","intro":"You're a Wild Goose — the kind who naturally brings everyone along for the long journey.","strength":"You always carry a sense of 'us.' You're willing to set off toward the far horizon again and again, to travel a long way for a destination worth reaching — and you know to take your turn at the front, breaking the wind so the whole formation flies farther with less effort. Your courage is a warm one, the kind that brings others with it.","shadow":"But you carry the weight of the whole flock too easily on your own shoulders. When someone falls behind, your instinct is to slow down and stay with them — even at the cost of running yourself empty. You rarely let yourself drift to the middle and be carried for a while.","niche":"You shine where there's a shared direction and people to travel with; where everyone goes their own way with no goal, you slowly lose your strength. What you need is a flock willing to take turns leading.","reframe":"You don't have to fly at the front forever. Let yourself drop into the middle sometimes and let the wind carry you — being held isn't weakness, it's the rest you're owed too."},"奇趣":{"animal":"Humpback Whale","habit":"It sings long, complex songs — and when it sees another species being hunted down by orcas, it will step in to protect creatures that have nothing to do with it at all.","intro":"You're a Humpback Whale — the kind who turns kindness into song, and sings it even for strangers.","strength":"You have a kindness that reaches beyond 'your own people.' You sing long, intricate songs, you can cross whole oceans on the longest of journeys, and when you see another creature being bullied, you step in without hesitation — even when it has nothing to do with you. Your care is vast, and so is the nerve it takes to act on it.","shadow":"But you so often think of others first and put your own needs far down the line. You stop for strangers, you spend yourself on things that aren't yours — and then you look up and find no one stopping for you. Your vastness can also be a way of spreading yourself too thin.","niche":"You're most at ease where your kindness has room to move and is cherished in return; in a place that runs purely on self-interest, you feel out of place. You need people as vast as you, to hold all that vastness back.","reframe":"You can step in for strangers — just remember to step in for yourself once, too. Sing that song to yourself now and then. Some of that kindness was always meant to stay with you."},"坚韧":{"animal":"Wildebeest","habit":"Year after year it crosses the savanna and fords danger-filled rivers to complete one of the greatest migrations on Earth, carried through by the courage of the whole herd.","intro":"You're a Wildebeest — the kind who presses forward with the herd and crosses any danger, as long as you're together.","strength":"You have a courage that belongs to the group. Year after year, you and the herd cross the plains and ford treacherous rivers — not because you're unafraid, but because 'together' makes you brave. You can endure the long road, and you can hold steady at the crossings.","shadow":"But you're so used to moving with the herd that you sometimes forget to ask yourself, 'where do I want to go?' You've handed your direction to the current of the group, and your own voice is easily drowned out; stopping or falling behind makes you strangely uneasy.","niche":"You're strongest in a group with a shared journey and real trust; in a scattered crowd of separate agendas, you lose your sense of direction. You need companions worth crossing a river with.","reframe":"Moving with the herd is powerful — but now and then, it's worth asking the voice the current covered over: is this the river you wanted to cross? You can run with the herd, and you can still choose your own way."}},"群探冲":{"温柔":{"animal":"Sea Otter","habit":"While they sleep, sea otters hold hands so they don't drift apart in the night — and each one keeps a favorite rock of its own.","intro":"You're a Sea Otter — soft in your bonds, quick to care for others, and quietly guarding a small treasure of your own.","strength":"You give off warmth. You'll hold a friend's hand so neither of you drifts apart in your sleep; you're playful, curious, quick to spark, and you bring joy to the people around you with ease. And you know how to guard the small treasure that's yours alone.","shadow":"But your energy comes in waves — after you've had your fill, you need to float back to the surface and rest. Others don't always understand that sudden quiet, and may mistake it for you growing cold. You're also afraid that if you let go of a hand, someone you love will drift away.","niche":"You're at your most open in bonds that let you play together and then come back to recharge; in a setting that demands you stay warm and never tired, you get drained. You need people who don't read your 'pause' as distance.","reframe":"You don't have to hold everyone's hand all the time. Let yourself float back up and take care of yourself first — the people you trust won't drift away just because you loosened your grip."},"奇趣":{"animal":"Raven","habit":"It will slide down a snowy slope purely for fun, and bring little gifts — pebbles, shiny trinkets — to the people who've been kind to it.","intro":"You're a Raven — clever, playful, and quick to remember kindness; the more time someone spends with you, the more you surprise them.","strength":"You're ridiculously clever. You'll slide down a snowy slope just for the fun of it, and you'll bring a little gift to someone who's treated you well. Your mind moves fast, you remember who was good to you, and you always find a way to surprise the people you're close to. Your drive comes in bursts: the mood strikes, you throw yourself in and play your fill, and once you've had enough, you step back.","shadow":"But your cleverness can also hide your true feelings. You use jokes, wit, and little gifts to get close to people, yet you don't easily hand over the fragile part of you. People find you fun — but they don't always feel they've truly gotten in.","niche":"You glow around people who appreciate your mischief and are willing to play along; in a stiff, humorless place, you feel bored and boxed in. You need someone clever enough to catch what you throw.","reframe":"You don't have to trade wit and gifts for closeness every time. Now and then, set down the gift in your beak and just say something true — you're interesting enough on your own; you're worth getting close to without the performance."},"坚韧":{"animal":"Adélie Penguin","habit":"In freezing seas they leap from the water in crowds and charge ahead — often the one who jumps in first and then turns back to call the others along.","intro":"You're an Adélie Penguin — the one in the group who dives in headfirst and pulls everyone forward.","strength":"You're brave to a ridiculous degree. In the freezing sea, you leap out of the water in a crowd and charge ahead without a flicker of hesitation. You've got a reckless, lovable drive — often the one who jumps in first, then turns back to shout, 'the water's fine, come on!'","shadow":"But after leading the charge for so long, you forget that you, too, can be scared and tired. You hide the hesitation and paper over the unease with action; only when you can't hold on any longer do others realize, with surprise, that you can fall down too.","niche":"You're most valuable in a group that needs someone to lead and still holds each other up; in a crowd where everyone hangs back and no one dares move, you end up alone. You need companions who'll charge in with you — and catch you when you're spent.","reframe":"Leading the dive is brave — but you're allowed to call out, 'I'm a little scared,' too. Naming the unease won't weaken your courage. The truly tough thing is daring to admit you're fragile."}},"群守续":{"温柔":{"animal":"Elephant","habit":"It can 'talk' with companions miles away through vibrations in the ground, and will linger in long mourning where one of its own has died.","intro":"You're an Elephant — the most devoted guardian in the herd, able to hold even other people's grief.","strength":"You're steady, and deeply loving. You can 'speak' to companions miles away through vibrations in the earth, and you'll mourn a lost member for a long, long time. You watch over the whole herd, vigilant — the presence that makes everyone feel safe.","shadow":"But you carry everyone's safety on your back, and your own exhaustion you rarely speak aloud. You're so good at holding others that you forget you can buckle too; for you, setting down responsibility feels almost like a sin.","niche":"You shine in a stable herd that needs to be guarded and cared for; in turmoil where everyone fends for themselves, you wear thin. You need a herd that will turn back and watch over you, too.","reframe":"Guardians need guarding too. You've held the weight of so many — now let someone hold you. Speaking your tiredness aloud won't make you any less reliable; it just means you no longer carry it all alone."},"奇趣":{"animal":"Emperor Penguin","habit":"Huddling together in temperatures dozens of degrees below zero, they constantly rotate positions so every bird takes a turn in the warm center and a turn out on the cold edge.","intro":"You're an Emperor Penguin — the kind who makes sure everyone takes a turn being cared for.","strength":"Your kindness is wise. In temperatures dozens of degrees below zero, you huddle for warmth — but you keep rotating, so every one of you takes a turn at the warm center and a turn facing the wind on the edge. You instinctively share the hardship fairly, never letting anyone stay cold for long. And when it's coldest, you're also the one who balances that single egg steadily on your feet, going without food or drink to make it through the whole winter — a watcher to the end.","shadow":"But you're so set on 'everyone getting cared for' that you keep putting yourself in the last shift. You quietly stand a few extra rounds on the cold edge and think nothing of it; over time, no one realizes that you get cold too.","niche":"You're warmest in a group that knows how to take turns and shoulder things together; in a place that only takes and never rotates, you freeze through. You need people just as willing to face the wind for you.","reframe":"You've taken so many turns for everyone — it's your turn to stand in the warm center now. Let someone block the wind for you. You looked after everyone; you're part of 'everyone' too."},"坚韧":{"animal":"Musk Ox","habit":"When danger comes, the adults form a ring with the young tucked safely in the middle, all facing outward to take the brunt of an Ice-Age cold and its predators.","intro":"You're a Musk Ox — the kind who protects by pulling the vulnerable inside and facing the danger yourself.","strength":"You have a silent, hardcore kind of protectiveness. When danger comes, you form a ring with the young tucked in the center, every adult facing outward to take the hit. You can withstand an Ice-Age cold, and you can block the harshest wind for those behind you.","shadow":"But you always place yourself on the outermost edge, facing the storm, and rarely let anyone see that you get frostbitten too. With 'I'll carry it,' you block all their worry — and you also block their chance to come close and ache for you.","niche":"You're strongest in a group worth protecting, one that's worth guarding; where no one's worth the guard, or no one understands your guarding, you feel lonely and worn out. You need the ones inside the ring to glance back at you now and then.","reframe":"You've stood facing the storm for a long time. Turn around once in a while, and let the ones inside the ring block the wind for you — being protected won't stop you from being the ox who carries things, it'll just let you carry them a little longer."}},"群守冲":{"温柔":{"animal":"Sika Deer","habit":"Living in herds and intensely alert, it catches the faintest stir in the grass and bounds away in one graceful leap the moment something feels off.","intro":"You're a Sika Deer — fine-tuned and quick to sense, always the first to feel a shift in the mood.","strength":"You're sensitive, gracefully so. Living in a herd, you're intensely alert — not a rustle escapes you, and the instant something feels wrong, you can spring up lightly and away. You have a natural delicacy with people and atmospheres, often the first to read the feeling in a room.","shadow":"But that sensitivity also leaves you taut. A subtle shift others miss can tug at you all day; you worry ahead of time on everyone's behalf, and your nerves struggle to truly settle. Sometimes the danger hasn't even arrived, and you're already tired.","niche":"You're most at ease in a gentle, predictable, considerate group; in turmoil and conflict, constant vigilance drains you. You need a meadow where you can lower your guard and graze in peace.","reframe":"Your sharpness is a gift, but not every rustle means danger. Try teaching your nerves to tell a true alarm from a false one — you can keep that delicacy and still let yourself, now and then, sit somewhere without worrying about a thing."},"奇趣":{"animal":"Prairie Dog","habit":"Its calls are detailed enough to describe a predator's kind, size, even color — and it greets others with a little 'kiss.'","intro":"You're a Prairie Dog — the one in the community who keeps danger clearly announced and keeps everyone close with affection.","strength":"You're a remarkable communicator. Your calls are detailed enough to describe a predator's species, size, even its color, and you greet others with a little 'kiss.' You can pass information along precisely, and you know how to bind everyone together with closeness. And when danger's real, you react fast — one alarm call, a flash back into the burrow, not a moment wasted.","shadow":"But you're so busy watching for danger and passing the word that you rarely have room for your own feelings. You sound the alarm for everyone, yet your own unease is seldom heard; you hold the whole community together, and still you can feel alone inside it.","niche":"You're most valuable in a community that values communication and looks out for each other; in chaos where everyone talks over everyone, you get anxious and worn out. You need a companion willing to listen to you, too.","reframe":"You've announced so much danger for everyone — you deserve someone asking, 'and you?' Turn the alarm down to a whisper now and then and speak your own unease. You're not just the one who carries the news; you're someone worth caring about, too."},"坚韧":{"animal":"Meerkat","habit":"They take turns standing sentry for the whole group, and even teach their pups, step by step, how to handle a venomous scorpion.","intro":"You're a Meerkat — watching over the group and passing on, bit by bit, how to survive.","strength":"You're a born guardian and teacher. You take turns standing watch, always alert for the group; you even teach the pups, hands-on, how to deal with a venomous scorpion. You're vigilant and dependable, passing the skills of survival down to those around you, steadily. And the moment the alarm sounds, you can switch in an instant from standing still to action — moving as one, fast and decisive.","shadow":"But you've stood watch so long you've nearly forgotten you're allowed to come off duty. 'I have to keep watch' has become instinct, and you can't truly relax; busy teaching others how to live, you yourself are rarely cared for or taught.","niche":"You're irreplaceable in a group that needs watching and passing-down; under constant pressure and danger, you get used up. You need companions who can take a shift, so you can sleep in peace too.","reframe":"You don't have to stand every watch alone. Hand the post to someone you trust and go catch up on sleep — a watcher who can let go is the one who lasts. You deserve, now and then, to be watched over, with nothing to keep an eye on."}},"独探续":{"温柔":{"animal":"Sea Turtle","habit":"Alone, it crosses thousands of kilometers of ocean by sensing Earth's magnetic field — and decades later, returns with precision to the very beach where it was born.","intro":"You're a Sea Turtle — able to travel far on your own, while always keeping a homing point you can return to.","strength":"You're independent and resilient. You can cross thousands of kilometers of ocean alone, guided by the planet's magnetic field, and decades later return, precisely, to the beach where you were born. You can keep going without company; inside you is a sense of direction no one can take away.","shadow":"But you're so used to carrying it alone, going it alone, that you travel too far for others to catch up or truly get close. You've made 'I can manage by myself' the default, and slowly, asking for help or walking side by side starts to feel foreign; drift long enough, and you lose touch with people.","niche":"You're most settled where there's freedom and open water, plus a point you can return to; in a relationship that demands you stay present every moment, you suffocate. You need someone who understands, 'I travel far, but I will come back.'","reframe":"Traveling far alone doesn't mean every wave is yours to carry. That homing point inside you can be a person, too — letting someone become your beach won't tether your distance; it'll just give you a light to come back to."},"奇趣":{"animal":"Albatross","habit":"It can glide over the open sea for years on end, barely touching land — and yet it keeps a single mate for life, devoted almost to the point of stubbornness.","intro":"You're an Albatross — seemingly always wandering and alone, yet underneath, holding one fierce and singular tie.","strength":"You belong to the far distance. You can glide over the sea for years on end, barely landing, daring to take a whole unfamiliar ocean as your own territory to roam. You're independent, enduring, unafraid of going far alone — and beneath all that wandering, you keep a single mate for life, devoted almost to stubbornness.","shadow":"But you fly so long and so far that landing itself unsettles you. You savor the vastness of going solo, and you also tend to postpone 'coming ashore' forever; the one you've set your heart on may be waiting for someone who's always up in the sky.","niche":"You're most whole when you can soar freely and still have a shore you truly want to return to; trapped, unable to fly, you wither. You need someone who isn't afraid of how far you go, and trusts that you'll come home.","reframe":"You can keep flying — but don't forget that landing is a skill too. Now and then, fold your wings and stay, solidly, beside that person — coming ashore isn't a cage, it's the reason your far distances mean anything."},"坚韧":{"animal":"Arctic Tern","habit":"Each year it travels alone between the Earth's two poles, chasing an endless summer — the longest migration of any creature on the planet.","intro":"You're an Arctic Tern — chasing the light your whole life, never stopping, turning what others call restlessness into far horizons.","strength":"You have an almost legendary endurance. Each year you travel, alone, between the planet's two poles, chasing a summer that never ends — the farthest-migrating creature on Earth. What others see as restlessness is, in you, a refusal to settle for less. And this longest journey on Earth, you mostly complete on your own.","shadow":"But you can't stop. You've made 'being on the road' your way of existing, and the moment you're still, an emptiness creeps in; you've chased the light your whole life, yet rarely ask whether you also need a place to stop and chase nothing at all.","niche":"You're most alive when there's always a new horizon, a light to keep chasing; in stagnation, repetition, no next journey in sight, you lose your sense of meaning. You need someone who gets this chase, and won't try to talk you into settling down.","reframe":"You've chased the light so long — let yourself stay still in one place sometimes, and let the light come find you instead. Stopping isn't giving up the distance — sometimes it's how you find out what you've been chasing all along."}},"独探冲":{"温柔":{"animal":"Fennec Fox","habit":"Its ears are bigger than its face — big enough to hear prey moving underground — and it can live in the desert on almost no water at all.","intro":"You're a Fennec Fox — busy and nimble on your own, able to make a sweet life even out of scarcity.","strength":"Your senses are sharp, you're quick-witted and self-sufficient. Those ears, bigger than your face, can hear prey moving underground; you can live on almost no water, always finding a way to make something flavorful out of the barest place. On your own, you can make a life that's full and lively. And you're nimble, quick — a sudden dig, a light little leap, a flurry of busyness, and then you settle right back down once you've had your fill.","shadow":"But you're too good at 'digesting it all yourself.' You sense everything, arrange your days neatly alone, and rarely send out an 'I need.' You live so well in the barren places that people assume you lack for nothing and need no looking-after.","niche":"You're happiest where you have your own space and something new to explore; in noise, smothering closeness, or a relationship that gives you no solitude, you get restless. You need someone who respects your independence and still sees that you have needs too.","reframe":"You can live well in scarcity — but you don't always have to be the one who 'lacks for nothing.' Beyond pricking up your ears for others, let others hear what you need too — being cared for won't make you look weak; it'll just add a little sweetness to the lean days."},"奇趣":{"animal":"Octopus","habit":"It has three hearts and 'nine brains' spread through its body, can change color in an instant, use a coconut shell as a tool, and vanish in a cloud of ink.","intro":"You're an Octopus — a one-of-a-kind explorer who goes it alone, thinking with your whole body, three hearts all beating for curiosity.","strength":"You're a born problem-solver. A puzzle you've never seen, a closed door — to you they're invitations; you reach out, learn by trying, until you find a gap no one else thought of and slip through. The moment the environment changes, you take on a new color and texture; alone, you can still explore the world to its depths. Your cleverness is the 'there's always another way' kind.","shadow":"But you're also far too good at disappearing. When things close in, when someone's about to truly see you, your instinct is to spray a cloud of ink, change to a protective color, and slip quietly back to your den. You're used to solving everything alone — you'd sooner figure out how to escape the tank by yourself than send the signal 'I'm stuck.' And that tide-like rhythm of yours — the people around you can't always keep pace.","niche":"You thrive where you have a den entirely your own, the freedom to explore, and a steady stream of fresh puzzles; you wither where you're required to be visible at all times, uniform, unchanging. The people who suit you best are the ones who don't take your disappearances as rejection — and who are curious enough to come tinker alongside you.","reframe":"Changing color, spraying ink, slipping away — these instincts saved you, again and again; they aren't wrong. But you don't have to vanish every time you're seen; some dens are safe enough that you can stay in them without changing color, and let one or two people you trust see you as you really are. And — your 'too much, too strange, too many directions' was never a flaw to be trimmed. That's nine brains."},"坚韧":{"animal":"Hummingbird","habit":"At night it can drop its heartbeat and temperature to near-death to survive the cold; by day it bursts back to full power, wings like lightning, and can even fly backward.","intro":"You're a Hummingbird — able to drop to zero and recharge after burning all the way out, then reignite with astonishing intensity.","strength":"You're small, yet startlingly strong — and always on your own. At night, you can lower your heartbeat and temperature to near-death to outlast the cold; by day, you burst back to full power, wings like lightning, even flying backward — all to reach one freshly opened flower. You have a tireless curiosity about the world, you know how to rest completely and to burn completely, and in that swing lies an intensity others don't have.","shadow":"But that 'all-on or nearly-off' rhythm is hard for outsiders to understand. You burn too bright, then go so still you seem to vanish; people panic when you're in your 'near-death' rest, or can't keep up when you flare. And you tend to push yourself until the tank's bone-dry before you'll stop.","niche":"You're most alive where you're allowed your highs and lows, not forced into an even pace; where constant, steady output is demanded and 'vanishing to charge' isn't allowed, you get wrung out. You need people who understand your rhythm and won't disturb you while you recharge.","reframe":"That near-death rest of yours isn't weakness — it's the reason you can come back to full power. Don't wait until the tank's empty to let yourself stop; choosing to drop to zero and recharge won't cost you that astonishing intensity, it'll just let it burn longer."}},"独守续":{"温柔":{"animal":"Sloth","habit":"It moves so slowly that algae grows on its fur, living a long, steady life on almost no energy, never wasting a scrap of effort on what isn't worth it.","intro":"You're a Sloth — slow, but with the wisdom of saving your energy for what truly matters.","strength":"You hang alone, high in the canopy, with an ease people underrate. You move so slowly that moss grows on your back, and on almost no energy you make your days long and steady. You're so still that the slowness itself becomes your best camouflage — danger often can't even spot you. You don't grasp or compete, yet you have a knack for spending your strength only where it counts — the things others wear themselves out over, you long ago learned to let go.","shadow":"But your slowness is often misread as passivity or stalling. You can also let 'take it slow' turn into 'never get to it,' leaving what you truly want to do stuck in place; you're so good at conserving energy that you sometimes miss the moment to act, the moment to come close.","niche":"You're most at peace where you aren't rushed and can live at your own pace; in an efficiency-driven place where everyone's hurrying, you get pushed along and misunderstood. You need people who get that 'slow is a rhythm too.'","reframe":"Your slowness is wisdom — but don't let it become a permanent standstill. Spend the energy you've saved, generously, on one thing that truly matters now and then — taking it slow doesn't mean never getting there; you deserve to be, for certain things, just a little bit faster."},"奇趣":{"animal":"Pangolin","habit":"The only mammal covered in scales, it rolls into a perfectly sealed ball the moment it's startled — defending itself not by attacking, but by guarding itself completely shut.","intro":"You're a Pangolin — gentle yet armored, harmless, and yet no one can pry open your core.","strength":"You're gentle, but not to be pushed around. As the only scaled mammal, the moment you're startled you roll into a perfectly sealed ball — defending not by attacking, but by guarding yourself airtight. You're quiet, inward, with a protective shell others can't see through. And you can hold out — quietly, unhurriedly carrying on a slow thing for a very long time.","shadow":"But when you curl up, even kindness gets shut out. Your armor guards your core, and it also leaves the ones who genuinely want to come close with no way in; you're so used to defending alone that, over time, even you half-forget what the soft self inside the shell looks like.","niche":"You're most at ease where it's safe, undisturbed, and trust can build slowly; somewhere invasive, demanding you stay open at all times, you instinctively curl tighter. You need patient people, willing to wait for you to open.","reframe":"Your armor is meant to protect your core, not to keep you forever out of reach. With the one or two who've waited so long for you, try loosening, slowly — curling up is safe, but only by unfurling now and then will you learn that some hands come to touch, not to harm."},"坚韧":{"animal":"Mountain Goat","habit":"It evolved special hooves that let it stand, alone, on near-vertical cliffs, picking its path — making a home of the most extreme heights.","intro":"You're a Mountain Goat — the kind who, dropped into any hardship, finds a foothold and makes it bloom.","strength":"You're a born evolver of resilience. The sheer cliffs others avoid, you've evolved special hooves to walk — standing, alone, steady on near-vertical rock, picking your path. You don't fight for the easy plains; you make a home of the most extreme places — able to take pressure, able to adapt, able to root down wherever you land.","shadow":"But you carry so much, so well, that you forget hardship can be shared. You climb the cliffs alone and never cry tired or afraid, letting others assume you need no help; over time, you've made every difficulty 'my own business' by default.","niche":"You shine where there's challenge, somewhere your adaptability gets to work; in too-easy comfort with no slope to climb, you actually get bored. But you also need a place to come down off the cliff, where you don't have to stay braced every second.","reframe":"That you can bloom on a cliff is your gift — but it's not a reason you have to suffer alone. Come down off the rock face sometimes and let someone lend a hand — accepting help won't blunt your resilience; it'll just make the next dangerous stretch a little less lonely."}},"独守冲":{"温柔":{"animal":"Hedgehog","habit":"When threatened, it curls into a ball of spines to protect itself — spines turned outward in defense, never to attack anyone.","intro":"You're a Hedgehog — your power is in guarding yourself well, not in pricking anyone else.","strength":"You're gentle, and you know how to protect yourself. When threatened, you curl into a ball of spines to shield yourself — never to attack. Your spines are for defense, not for harming others; beneath your quiet, you go your own way and don't make a fuss, and under that still surface is an especially soft heart.","shadow":"But you curl up too fast — sometimes before you've even told friend from foe, the spines are already up. Your defense keeps the hurt out, and it keeps the hugs out too; the people who want to come close are often pushed back a step by your reflexive prickle.","niche":"You're most relaxed where it's gentle, safe, and won't suddenly hurt you; in a place full of conflict and intrusion, you stay bristled all the time. You need patient people, who won't walk off just because they got pricked once.","reframe":"Your spines protect that soft heart; they aren't meant to refuse every approach. Try giving yourself half a second before the spines go up, to tell the difference: is this a threat, or a hand reaching out to hold yours? Some people are worth slowly lowering your spines for."},"奇趣":{"animal":"Platypus","habit":"With eyes, ears, and nose shut, it hunts with deadly precision by sensing faint electric fields in the water — and it's a mammal that lays eggs, a body that breaks every category.","intro":"You're a Platypus — reading the world through a 'sixth sense' no one else has, fitting into no ready-made box.","strength":"You're singular to the point of being your own category. With eyes, ears, and nose closed, you hunt with precision just by sensing faint electric fields in the water, and you're a mammal that lays eggs — a body that breaks every classification. You're cautious by nature and not easily drawn out: you watch quietly from beneath the surface, using that intuition no one else has to read your surroundings first, and act only once it feels safe — and the moment you lock on, you dive in fast, quick enough to catch anyone off guard.","shadow":"But 'fitting into no box' also means loneliness. The way you sense things isn't like other people's, and it's often hard to be understood or categorized; you lean so heavily on your own singular intuition that you don't quite trust, or seek, anyone else's view.","niche":"You're most at ease where you're allowed to be 'different' and your odd intuition is appreciated; in a place that demands you fit in and give the standard answer, you feel wrong all over. You need people who won't rush to label you, willing to tune into your unusual frequency.","reframe":"That you fit into no box was never a flaw — it's the most precious thing about you. But don't let 'no one understands' make you trust only your own intuition; now and then, say what you sense aloud and let one or two people try to enter your frequency. One of a kind as you are, you deserve to be understood, not just marveled at."},"坚韧":{"animal":"Pallas's Cat","habit":"It has the densest fur of any cat to withstand the cold; its low, round ears let it press to the ground and peek out from behind a rock, watching without being seen.","intro":"You're a Pallas's Cat — guarding your territory alone, watching without a flicker, then striking fast and sure when it counts.","strength":"You go your own way, self-sufficient on your own ground. You're alert by nature, used to pressing low and watching quietly from behind cover, taking in everything without giving anything away — and when you strike, it's fast and sure, one clean pounce. The colder and harder the place, the more you can carry yourself through on that thick coat of yours.","shadow":"But you hide too well. You're used to tucking yourself behind a rock, slow to show yourself, keeping even your feelings behind a deadpan face; you've weathered the cold alone, and rarely let anyone know that you get cold too. Over time, the people who want to come close can barely catch the moment you peek out.","niche":"You're most settled where you can be alone with your own ground to guard; somewhere loud, demanding you show up at all times, warm and outgoing, you feel wrong in your skin. You need patient people who won't rush you to appear, willing to wait for you to peek out, slowly.","reframe":"That thick coat that's weathered the cold, that unflinching face — they've protected you well. But now and then, you can poke your head out from behind the rock a little more — and let the one or two who've waited so long actually see you. Being seen won't cost you that 'getting through winter alone' skill; it'll just make winter a little less cold."}}}}};
+const SHARE_URL = "https://maggie-song-923.github.io/";
 
 let lang = "zh";
 let screen = "intro";
 let qIndex = 0;
 let answers = [];
 let result = null;
+let shareMode = "dark";
 
 const $ = id => document.getElementById(id);
 const L = () => DATA[lang];
 
-const TONE_COLOR = {"温柔":"var(--rose)","奇趣":"var(--teal)","坚韧":"var(--clay)"};
-const TONE_SOFT  = {"温柔":"#C58B8120","奇趣":"#5C8C8F20","坚韧":"#BE8B4520"};
+const TONE_COLOR = {"温柔":"#D8A59E","奇趣":"#7FB3B6","坚韧":"#D4B36A"};
+const TONE_SOFT  = {"温柔":"#D8A59E22","奇趣":"#7FB3B622","坚韧":"#D4B36A22"};
 function cn(n){ return ["零","一","二","三","四","五","六","七","八","九","十"][n]||n; }
 
 function setScreen(s){
   screen = s;
+  document.body.dataset.screen = s;
   ["intro","quiz","result"].forEach(x=>$(x).classList.toggle("on", x===s));
   window.scrollTo(0,0);
 }
 
 function render(){
+  document.body.dataset.lang = lang;
   $("toggle").textContent = L().ui.toggle;
   $("credit").textContent = L().ui.credit;
   if(screen==="intro") renderIntro();
@@ -208,6 +2581,7 @@ function renderIntro(){
   $("i-lede").textContent = m.intro;
   $("i-note").textContent = m.note;
   $("i-start-t").textContent = u.start;
+  $("vlabel-intro").textContent = u.eyebrow;
 }
 
 function renderQ(i){
@@ -257,9 +2631,9 @@ function renderResult(){
   document.documentElement.style.setProperty("--tone-soft", TONE_SOFT[result.tone]);
 
   const box = $("r-axes"); box.innerHTML = "";
-  [ax.social[result.social], ax.risk[result.risk], ax.tempo[result.tempo], ax.tone[result.tone]].forEach(t=>{
-    const s = document.createElement("span"); s.className = "tag"; s.textContent = t; box.appendChild(s);
-  });
+  const labels = [ax.social[result.social], ax.risk[result.risk], ax.tempo[result.tempo], ax.tone[result.tone]];
+  labels.forEach(t=>{ const s=document.createElement("span"); s.className="tag"; s.textContent=t; box.appendChild(s); });
+  $("vlabel-result").textContent = labels.slice(0,3).join("・");
 
   $("r-pre").textContent = u.rPre;
   $("r-name").textContent = r.animal;
@@ -277,12 +2651,134 @@ function renderResult(){
   $("r-reframe").textContent = r.reframe;
   $("r-again").textContent = u.again;
   $("r-share").textContent = u.share;
+  $("r-share-btn").textContent = u.shareCard;
+}
+
+/* ---------- share card (pure canvas) ---------- */
+function hexA(hex,a){ const n=parseInt(hex.slice(1),16); return "rgba("+((n>>16)&255)+","+((n>>8)&255)+","+(n&255)+","+a+")"; }
+
+function makeShareCard(mode){
+  const r = L().results[result.key][result.tone];
+  const u = L().ui, ax = L().axis;
+  const dark = (mode==="dark");
+  const toneMap = dark ? {"温柔":"#D8A59E","奇趣":"#7FB3B6","坚韧":"#D4B36A"}
+                       : {"温柔":"#C9A29B","奇趣":"#6E9CA0","坚韧":"#C2A35A"};
+  const tone = toneMap[result.tone];
+  const col = dark
+    ? {bg:"#2B3A36",name:"#EEF3EF",sub:"#9DB0A8",body:"#C8D2CD",panel:"#33433E",panelText:"#D4DDD8"}
+    : {bg:"#ECEFEA",name:"#2E3A34",sub:"#6B7670",body:"#4A4F49",panel:"#FAFBF8",panelText:"#4D4A42"};
+
+  const W=1080, P=100, CW=W-2*P, INNER=CW-68;
+  const TMP=document.createElement("canvas"); TMP.width=W; TMP.height=2800;
+  const ctx=TMP.getContext("2d");
+  const mc=document.createElement("canvas").getContext("2d");
+  const F={ label:'600 28px "Noto Sans SC",sans-serif', pre:'500 30px "Noto Sans SC",sans-serif',
+    name:'600 108px "Cormorant Garamond",Georgia,"Noto Serif SC","Songti SC",serif', tag:'600 27px "Noto Sans SC",sans-serif',
+    intro:'500 41px Georgia,"Noto Serif SC","Songti SC",serif', hlabel:'700 24px "Noto Sans SC",sans-serif',
+    habit:'400 33px "Noto Sans SC",sans-serif', rlabel:'600 27px "Noto Serif SC","Songti SC",serif',
+    reframe:'500 39px Georgia,"Noto Serif SC","Songti SC",serif', foot:'500 30px "Noto Sans SC",sans-serif', url:'400 25px "Noto Sans SC",sans-serif' };
+  const LH={intro:62,habit:52,reframe:60};
+  function setLS(px){ if("letterSpacing" in ctx) ctx.letterSpacing=px+"px"; }
+  function rrect(x,y,w,h,rad){ ctx.beginPath(); ctx.moveTo(x+rad,y); ctx.arcTo(x+w,y,x+w,y+h,rad); ctx.arcTo(x+w,y+h,x,y+h,rad); ctx.arcTo(x,y+h,x,y,rad); ctx.arcTo(x,y,x+w,y,rad); ctx.closePath(); }
+  function wrap(text,font,maxW){ mc.font=font; const tk=text.match(/[A-Za-z0-9'\u2019.,!?;:()\-\u2014&%]+|\s+|[^\s]/g)||[]; const lines=[]; let line="";
+    for(const t of tk){ const test=line+t; if(mc.measureText(test).width>maxW && line.trim()!==""){ lines.push(line.replace(/\s+$/,"")); line=/^\s+$/.test(t)?"":t; } else line=test; }
+    if(line.trim()!=="") lines.push(line.replace(/\s+$/,"")); return lines; }
+
+  const introLines=wrap(r.intro,F.intro,CW);
+  const habitLines=wrap(r.habit,F.habit,INNER);
+  const reframeLines=wrap(r.reframe,F.reframe,INNER);
+
+  ctx.fillStyle=col.bg; ctx.fillRect(0,0,W,2800);
+  ctx.save(); ctx.globalAlpha=dark?0.15:0.16; ctx.fillStyle=tone; ctx.beginPath(); ctx.arc(W-140,150,235,0,Math.PI*2); ctx.fill(); ctx.restore();
+  ctx.textBaseline="alphabetic";
+
+  let cy=140;
+  setLS(4); ctx.font=F.label; ctx.fillStyle=col.sub; ctx.fillText(u.credit,P,cy); setLS(0);
+  cy+=78;
+  setLS(3); ctx.font=F.pre; ctx.fillStyle=col.sub; ctx.fillText(u.rPre,P,cy); setLS(0);
+  cy+=104;
+  ctx.font=F.name; ctx.fillStyle=col.name; ctx.fillText(r.animal,P-2,cy);
+  cy+=46;
+
+  /* tags */
+  const tags=[ax.social[result.social],ax.risk[result.risk],ax.tempo[result.tempo],ax.tone[result.tone]];
+  ctx.font=F.tag; const tagH=50, padX=20, gap=12; let tx=P, ty=cy;
+  ctx.textBaseline="middle";
+  tags.forEach(t=>{ const w=ctx.measureText(t).width+padX*2;
+    if(tx+w>P+CW){ tx=P; ty+=tagH+10; }
+    rrect(tx,ty,w,tagH,tagH/2); ctx.lineWidth=1.5; ctx.strokeStyle=tone; ctx.stroke();
+    ctx.fillStyle=tone; ctx.fillText(t,tx+padX,ty+tagH/2+1); tx+=w+gap; });
+  ctx.textBaseline="alphabetic";
+  cy=ty+tagH+44;
+
+  ctx.font=F.intro; ctx.fillStyle=dark?"#DCE4DF":"#3A423B";
+  introLines.forEach(l=>{ ctx.fillText(l,P,cy); cy+=LH.intro; });
+  cy+=24;
+
+  /* habit panel */
+  const habH=44+44+habitLines.length*LH.habit+20;
+  rrect(P,cy,CW,habH,22); ctx.fillStyle=col.panel; ctx.fill();
+  setLS(2); ctx.font=F.hlabel; ctx.fillStyle=tone; ctx.fillText(u.habitLabel.toUpperCase(),P+34,cy+50); setLS(0);
+  ctx.font=F.habit; ctx.fillStyle=col.panelText; let hy=cy+50+46;
+  habitLines.forEach(l=>{ ctx.fillText(l,P+34,hy); hy+=LH.habit; });
+  cy+=habH+48;
+
+  /* reframe panel */
+  const rfH=44+50+reframeLines.length*LH.reframe+26;
+  rrect(P,cy,CW,rfH,22); ctx.fillStyle=hexA(tone,dark?0.14:0.12); ctx.fill();
+  ctx.fillStyle=tone; ctx.fillRect(P,cy+14,5,rfH-28);
+  ctx.font=F.rlabel; ctx.fillStyle=tone; ctx.fillText(u.secReframe,P+34,cy+52);
+  ctx.font=F.reframe; ctx.fillStyle=col.body; let ry=cy+52+52;
+  reframeLines.forEach(l=>{ ctx.fillText(l,P+34,ry); ry+=LH.reframe; });
+  cy+=rfH+58;
+
+  /* footer: QR + caption */
+  const qr=qrcode(0,"M"); qr.addData(SHARE_URL); qr.make();
+  const nC=qr.getModuleCount(), cell=5, qSize=nC*cell, qpad=16, qbg=qSize+qpad*2;
+  rrect(P,cy,qbg,qbg,16); ctx.fillStyle="#FFFFFF"; ctx.fill();
+  ctx.fillStyle="#22302B";
+  for(let a=0;a<nC;a++) for(let b=0;b<nC;b++){ if(qr.isDark(a,b)) ctx.fillRect(P+qpad+b*cell, cy+qpad+a*cell, cell, cell); }
+  const capX=P+qbg+34;
+  ctx.font=F.foot; ctx.fillStyle=col.body; ctx.fillText(u.scCaption,capX,cy+qbg/2-6);
+  ctx.font=F.url; ctx.fillStyle=col.sub; ctx.fillText("maggie-song-923.github.io",capX,cy+qbg/2+38);
+  cy+=qbg;
+
+  const H=cy+96;
+  const OUT=document.createElement("canvas"); OUT.width=W; OUT.height=H;
+  OUT.getContext("2d").drawImage(TMP,0,0,W,H,0,0,W,H);
+  return OUT.toDataURL("image/png");
+}
+
+async function ensureFonts(){
+  if(!document.fonts||!document.fonts.load) return;
+  const loads=[ '600 108px "Cormorant Garamond"','600 60px "Noto Serif SC"','500 41px "Noto Serif SC"','400 33px "Noto Sans SC"','600 28px "Noto Sans SC"' ]
+    .map(f=>document.fonts.load(f).catch(()=>{}));
+  await Promise.race([ Promise.all(loads), new Promise(res=>setTimeout(res,1500)) ]);
+}
+function setSeg(){ $("sc-dark").classList.toggle("on",shareMode==="dark"); $("sc-light").classList.toggle("on",shareMode==="light"); }
+function renderShare(){
+  const url=makeShareCard(shareMode);
+  $("share-img").src=url; $("share-dl").href=url;
+  const r=L().results[result.key][result.tone];
+  $("share-dl").setAttribute("download",(r.animal||"animal")+".png");
+}
+async function openShare(){
+  const u=L().ui;
+  $("sc-dark").textContent=u.scDark; $("sc-light").textContent=u.scLight;
+  $("share-hint").textContent=u.scHint; $("share-dl").textContent=u.scDownload;
+  setSeg(); $("share-modal").hidden=false;
+  await ensureFonts(); renderShare();
 }
 
 $("toggle").addEventListener("click", ()=>{ lang = (lang==="zh" ? "en" : "zh"); render(); });
 $("i-start").addEventListener("click", ()=>{ answers=[]; result=null; renderQ(0); });
 $("q-back").addEventListener("click", ()=>{ if(qIndex>0) renderQ(qIndex-1); });
 $("r-again").addEventListener("click", ()=>{ answers=[]; result=null; setScreen("intro"); renderIntro(); });
+$("r-share-btn").addEventListener("click", openShare);
+$("sc-close").addEventListener("click", ()=>{ $("share-modal").hidden=true; });
+$("sc-dark").addEventListener("click", ()=>{ shareMode="dark"; setSeg(); renderShare(); });
+$("sc-light").addEventListener("click", ()=>{ shareMode="light"; setSeg(); renderShare(); });
+$("share-modal").addEventListener("click", e=>{ if(e.target===$("share-modal")) $("share-modal").hidden=true; });
 
 render();
 </script>
